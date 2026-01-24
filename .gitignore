@@ -27,3 +27,6 @@ drone-remote-unit/bin/
 
 # Ignore latex files
 *.synctex.gz
+
+# Ignore code workspace
+*.code-workspace
