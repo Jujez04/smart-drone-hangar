@@ -3,6 +3,7 @@
 
 Pir::Pir(int pin){
   this->pin = pin;
+  this->detected = false;
   pinMode(pin, INPUT);
 }
 

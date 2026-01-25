@@ -16,4 +16,11 @@
 #define SDA_PIN A4
 #define SCL_PIN A5
 
+#define PIR_CALIBRATION_TIME 10000
+
+#define SONAR_TIMEOUT_US 30000
+#define ADDRESS_LCD 0x27
+#define ROW_LCD 4
+#define COLUMN_LCD 20
+
 #endif

@@ -5,13 +5,10 @@
 
 class PeriodicTask : public Task {
 public:
-    PeriodicTask(int period) {
-        this->type = PERIODIC;
-        this->period = period;
-        timeElapsed = 0;
-    }
+    PeriodicTask() : Task(PERIODIC) {}
 
-    void init() {
+    void init(int period) {
+        this->period = period;
         timeElapsed = 0;
         active = true;
     }
