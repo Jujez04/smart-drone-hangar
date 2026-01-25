@@ -1,7 +1,7 @@
 package it.unibo.drone;
 
 
-public class LaunchApp {
+public class DashboardLauncher {
 
     public static void main(String[] args) {
         
