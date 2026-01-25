@@ -1,0 +1,214 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- PACCHETTI ---
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}        % Per i diagrammi FSM
+\usepackage{float}       % Per posizionare le immagini
+\usepackage{array}       % Per tabelle avanzate
+\usepackage{booktabs}    % Per tabelle estetiche
+\usepackage{listings}    % Per il codice sorgente
+\usepackage{xcolor}      % Per i colori
+\usepackage{hyperref}    % Per i link e l'indice interattivo
+\usepackage{longtable}   % Per tabelle lunghe su più pagine
+
+% --- LIBRERIE TIKZ ---
+\usetikzlibrary{shapes,arrows,positioning,automata,calc,shadows}
+
+% --- IMPOSTAZIONI PAGINA ---
+\geometry{margin=2.5cm}
+
+% --- STILE CODICE ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b, 
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{
+    \vspace{-2cm}
+    \vspace{1cm}
+    \textbf{\Huge Smart Drone Hangar System}\\[0.5cm]
+    \Large Assignment \#02 - Embedded Systems & IoT\\[0.5cm]
+    \large Academic Year 2025-2026
+}
+\author{
+    \textbf{Justin Carideo} \\ 
+    ID: 0001115610
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ==========================================
+% SEZIONE 1: INTRODUZIONE
+% ==========================================
+\section{Introduzione}
+
+\subsection{Overwiew}
+L'obiettivo è quello di creare un sistema embedded che rappresenta un "Smart Drone Hangar". Il sistema è composto da due sottosistemi:
+\begin{enumerate}
+    \item \textbf{Drone Hangar (Arduino)}: \tobefilled{Descrivi brevemente cosa fa la parte Arduino.}
+    \item \textbf{Drone Remote Unit (PC)}: \tobefilled{Descrivi brevemente cosa fa la GUI Java.}
+\end{enumerate}
+
+\subsection{Componenti usate}
+Il sistema utilizza le seguenti componenti hardware:
+\begin{itemize}
+    \item \textbf{Sensors}: \tobefilled{Elenca i sensori (es. HC-SR04, PIR, TMP36...)}
+    \item \textbf{Actuators}: \tobefilled{Elenca gli attuatori (es. Servo Motor, LEDs...)}
+\end{itemize}
+
+% ==========================================
+% SEZIONE 2: ARCHITETTURA
+% ==========================================
+\section{Architettura di sistema}
+
+\subsection{Software Design Pattern}
+Il software si basa su una architettura \textbf{task-based}, nella quale uno scheduler cooperativo gestisce le principali task del sistema.
+In particolare possiamo trovare i seguenti layer che compongono il sistema:
+
+\begin{itemize}
+    \item \textbf{HWPlatform}: incapsula tutte le compoenenti hardware, fornendo un livello di astrazione che gestisce interazioni a basso livello.
+    \item \textbf{Context}: una struttura dati condivisa tra le varie task del sistema.
+    \item \textbf{Task Logic}: Il comportamento del sistema è distribuito su diverse task specializzate pianificate dallo Scheduler.
+\end{itemize}
+
+\subsection{Task trattate}
+La FSM e le funzioni ausiliarie sono divise in task specifiche:
+
+\begin{description}
+    \item[HangarTask]
+    Adotta il pattern \texttt{Multi-state task}. Incorpora gli stati principali e coordina le altre task aggiornando il \texttt{Context} condiviso.
+
+    \item[DoorTask]
+    Responsabile della gestione degli stati della porta dell'hangar (Servo Motore) in base ai comandi presenti nel Context.
+
+    \item[AlarmTask]
+    Monitora continuamente i limiti di temperatura e gestisce gli stati di pre-allarme e allarme, sovrascrivendo le operazioni normali quando necessario.
+
+    \item[DistanceDetectorTask]
+    Gestisce il Rilevatore di Distanza del Drone (DDD/Sonar). Si occupa dell'attivazione (triggering) e del filtraggio delle letture ultrasoniche per aggiornare la distanza nel Context.
+
+    \item[PresenceDetectorTask]
+    Gestisce il Rilevatore di Presenza del Drone (DPD/PIR). Si occupa della calibrazione e della sincronizzazione del rilevamento di presenza.
+
+    \item[DisplayTask]
+    Gestisce il monitor LCD I2C. Legge lo stato del sistema dal Context e aggiorna i messaggi visualizzati in modo asincrono.
+
+    \item[SerialCommTask]
+    Gestisce la comunicazione bidirezionale con la Drone Remote Unit (DRU) su PC, effettuando il parsing dei comandi in ingresso e inviando aggiornamenti di stato.
+
+    \item[TestHWTask]
+    Una task dedicata utilizzata durante la fase di sviluppo per verificare e calibrare le singole componenti hardware in isolamento.
+\end{description}
+
+% ==========================================
+% SEZIONE 3: MACCHINA A STATI (FSM)
+% ==========================================
+\section{Finite State Machine (FSM) Design}
+
+
+\subsection{State Diagram}
+
+
+
+\subsection{Descrizione stati}
+
+% ==========================================
+% SEZIONE 4: HARDWARE
+% ==========================================
+\section{Implementazione Hardware}
+
+\subsection{Schematic / Wiring}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{schematic.png}
+%     \caption{Circuit Schematic}
+% \end{figure}
+
+\subsection{Configurazione Pin}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Component} & \textbf{Pin (Arduino)} & \textbf{Type (Input/Output/PWM/Analog)} \\
+\hline
+Sonar TRIG & 9 & Output \\
+\hline
+Sonar ECHO & 10 & Input \\
+\hline
+PIR Sensor & 2 & Input \\
+\hline
+Servo Motor & 11 & PWM \\
+\hline
+Temp Sensor & A0 & Analog \\
+\hline
+LED Green 1 & 4 & Output \\
+\hline
+LED Green 2 & 5 & Output \\
+\hline
+LED Red & 6 & Output \\
+\hline
+Button & 3 & Input \\
+\hline
+I2C LCD & A4/A5 & Output \\
+\hline
+\end{tabular}
+\caption{System Pinout}
+\end{table}
+
+% ==========================================
+% SEZIONE 5: DRONE REMOTE UNIT (PC)
+% ==========================================
+\section{Drone Remote Unit (Java)}
+
+\subsection{GUI}
+
+
+\subsection{Protocollo di Communicazione}
+La communicazione avviene a \textbf{9600 baud}.
+
+\textbf{PC $\to$ Arduino:}
+\begin{itemize}
+    \item 
+\end{itemize}
+
+\textbf{Arduino $\to$ PC:}
+\begin{itemize}
+    \item 
+\end{itemize}
+
+% ==========================================
+% SEZIONE 6: CONCLUSIONI
+% ==========================================
+\section{Conclusioni}
+
+\end{document}
