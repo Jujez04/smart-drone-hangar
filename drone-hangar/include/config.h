@@ -23,4 +23,16 @@
 #define ROW_LCD 4
 #define COLUMN_LCD 20
 
+#define DOOR_CLOSED_ANGLE 0
+#define DOOR_OPEN_ANGLE 180
+#define DOOR_MOVEMENT_TIME 1000
+
+#define SONAR_MIN_DISTANCE 3 // 3 cm
+#define SONAR_MAX_DISTANCE 150 // 1 m
+
+#define D1 80
+#define T1 1000 // 10 sec
+#define D2 10
+#define T2 1000 // 10 sec
+
 #endif

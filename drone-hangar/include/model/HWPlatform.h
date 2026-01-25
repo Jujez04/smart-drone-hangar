@@ -1,14 +1,13 @@
 #ifndef __HW_PLATFORM__
 #define __HW_PLATFORM__
 
-#include <LiquidCrystal_I2C.h>
-
 #include "devices/button/Button.h"
 #include "devices/led/Led.h"
 #include "devices/servo/ServoMotor.h"
 #include "devices/pir/Pir.h"
 #include "devices/sonar/Sonar.h"
 #include "devices/temperature/TempSensor.h"
+#include "devices/lcd/Display.h"
 
 
 class HWPlatform {
@@ -24,7 +23,7 @@ public:
     Pir* getPir();
     Sonar* getSonar();
     TempSensor* getTempSensor();
-    LiquidCrystal_I2C* getLcd();
+    Display* getLcd();
 
     void test();
 
@@ -37,7 +36,7 @@ private:
     Pir* pPir;
     Sonar* pSonar;
     TempSensor* pTemp;
-    LiquidCrystal_I2C* pLcd;
+    Display* pLcd;
 };
 
 #endif

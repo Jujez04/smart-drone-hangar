@@ -7,6 +7,7 @@
 #include "devices/button/ButtonImpl.h"
 #include "devices/servo/ServoMotorImpl.h"
 #include "devices/temperature/TempSensorTMP36.h"
+#include "devices/lcd/LcdI2C.h"
 
 #include "kernel/Logger.h"
 
@@ -22,14 +23,13 @@ HWPlatform::HWPlatform() {
   pSonar = new Sonar(SONAR_ECHO_PIN, SONAR_TRIG_PIN, SONAR_TIMEOUT_US);
   pTemp = new TempSensorTMP36(TEMP_PIN);
 
-  pLcd = new LiquidCrystal_I2C(ADDRESS_LCD, COLUMN_LCD, ROW_LCD);
+  pLcd = new LcdI2C(ADDRESS_LCD, COLUMN_LCD, ROW_LCD);
 }
 
 void HWPlatform::init() {
   pLcd->init();
-  pLcd->backlight();
+  pLcd->turnOn();
   pPir->calibrate();
-  pLcd->clear();
   pMotor->on();
   pMotor->setPosition(0);
   pMotor->off();
@@ -67,7 +67,7 @@ TempSensor *HWPlatform::getTempSensor() {
   return pTemp;
 }
 
-LiquidCrystal_I2C *HWPlatform::getLcd() {
+Display *HWPlatform::getLcd() {
   return pLcd;
 }
 
