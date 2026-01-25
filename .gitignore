@@ -30,3 +30,10 @@ drone-remote-unit/bin/
 
 # Ignore code workspace
 *.code-workspace
+
+# Ignore latex output files
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.pdf
+docs/*.toc
