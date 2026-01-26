@@ -2,155 +2,88 @@
 #include "kernel/Logger.h"
 #include "config.h"
 
+// Definizione Protocollo
+const String SerialCommTask::CMD_PREFIX = "ru:";
 const String SerialCommTask::APP_PREFIX = "dh:";
 const String SerialCommTask::LOG_PREFIX = "lo:";
 
-SerialCommTask::SerialCommTask(Context* pContext)
-    : pContext(pContext) {
-    setState(LISTENING);
+SerialCommTask::SerialCommTask(Context* pContext) : pContext(pContext) {
     inputBuffer = "";
-    inputBuffer.reserve(256);
+    inputBuffer.reserve(50); // Prevenzione frammentazione heap
+    lastStatusTime = 0;
 }
 
-void SerialCommTask::init() {
-    AperiodicTask::init();
+void SerialCommTask::init(int period) {
+    PeriodicTask::init(period);
     Serial.begin(SERIAL_BAUD_RATE);
-    log("Serial initialized");
+    delay(100); 
 }
 
 void SerialCommTask::tick() {
-    // Always check for serial data
-    readSerial();
+    // 1. Lettura Input
+    readSerialData();
 
-    switch (state) {
-        case LISTENING: {
-            if (checkAndSetJustEntered()) {
-                // Ready
-            }
-            // Check if we need to send alarm
-            if (pContext->isAlarm() && !pContext->isAlarmSendedToDRU()) {
-                setState(SENDING);
-            }
-
-            break;
-        }
-        
-        case PROCESSING: {
-            if (checkAndSetJustEntered()) {
-                // Command processed
-            }
-            setState(LISTENING);
-            break;
-        }
-        
-        case SENDING: {
-            if (checkAndSetJustEntered()) {
-                if (pContext->isAlarm() && !pContext->isAlarmSendedToDRU()) {
-                    sendAlarmToDRU();
-                    pContext->confirmAlarmSendedToDRU();
-                }
-                sendStatusToDRU();
-            }
-            setState(LISTENING);
-            break;
-        }
+    // 2. Invio Stato Periodico
+    if (millis() - lastStatusTime >= STATUS_PERIOD) {
+        sendStatusUpdate();
+        lastStatusTime = millis();
     }
 }
 
-void SerialCommTask::readSerial() {
+void SerialCommTask::readSerialData() {
     while (Serial.available() > 0) {
-        char ch = Serial.read();
+        char ch = (char) Serial.read();
+
         if (ch == '\n') {
             if (inputBuffer.length() > 0) {
-                handleIncomingMessage(inputBuffer);
+                processCommand(inputBuffer);
                 inputBuffer = "";
-                setState(PROCESSING);
             }
-        } else if (ch != '\r') {
+        } 
+        else if (ch != '\r') { 
             inputBuffer += ch;
         }
     }
 }
 
-void SerialCommTask::handleIncomingMessage(const String& msg) {
-    String command;
-    if (!parseCommand(msg, command)) {
-        log("Invalid message: " + msg);
-        return;
-    }
-    log("Received: " + command);
+void SerialCommTask::processCommand(String msg) {
+    msg.trim(); // Rimuove \r, \n e spazi
 
-    if (command == "TAKEOFF") {
-        pContext->confirmTakeOffCommandReceived();
-        sendLogMessage("Takeoff command received");
-
-    } else if (command == "LANDING") {
-        pContext->confirmLandingCommandReceived();
-        sendLogMessage("Landing command received");
-
-    } else if (command == "STATUS") {
-        sendStatusToDRU();
-
-    } else if (command == "RESET") {
-        pContext->confirmResetButtonPressed();
-        sendLogMessage("Remote reset triggered");
-
-    } else {
-        log("Unknown command: " + command);
-    }
-}
-
-bool SerialCommTask::parseCommand(const String& msg, String& command) {
-    int colonIndex = msg.indexOf(':');
-
-    if (colonIndex > 0) {
-        String prefix = msg.substring(0, colonIndex);
-        if (prefix == "CMD") {
-            command = msg.substring(colonIndex + 1);
-            command.trim();
-            return command.length() > 0;
+    // 1. Controllo Prefisso Standard "ru:"
+    if (msg.startsWith(CMD_PREFIX)) {
+        // Estrai il comando pulito (rimuovi "ru:")
+        String cmd = msg.substring(CMD_PREFIX.length());
+        
+        // 2. Switch sui comandi
+        if (cmd == "TAKEOFF") {
+            pContext->confirmTakeOffCommandReceived();
+            sendLog("CMD TAKEOFF ACCEPTED");
+        } 
+        else if (cmd == "LANDING") {
+            pContext->confirmLandingCommandReceived();
+            sendLog("CMD LANDING ACCEPTED");
+        } 
+        else if (cmd == "RESET") {
+            pContext->confirmResetButtonPressed();
+            sendLog("CMD RESET ACCEPTED");
         }
-        return false;
-    } else {
-        command = msg;
-        command.trim();
-        return command.length() > 0;
+        else {
+            sendLog("ERROR: Unknown command -> " + cmd);
+        }
+    } 
+    else {
+        // Messaggio ignorato (rumore o formato errato)
+        // sendLog("Ignored raw msg: " + msg);
     }
 }
 
-void SerialCommTask::sendStatusToDRU() {
-    String status = APP_PREFIX + "STATUS:" + pContext->getStatusMessageForDRU();
-    Serial.println(status);
+void SerialCommTask::sendStatusUpdate() {
+    // Standard: dh:STATUS:<VALORE>
+    String msg = APP_PREFIX + "STATUS:" + pContext->getStatusMessageForDRU();
+    Serial.println(msg);
 }
 
-void SerialCommTask::sendAlarmToDRU() {
-    String alarmMsg = APP_PREFIX + "ALARM";
-    Serial.println(alarmMsg);
-    sendLogMessage("CRITICAL ALARM!");
-}
-
-void SerialCommTask::sendLogMessage(const String& msg) {
+void SerialCommTask::sendLog(const String& msg) {
+    // Standard: lo:<MESSAGGIO>
     Serial.println(LOG_PREFIX + msg);
-}
-
-void SerialCommTask::setState(SerialCommState s) {
-    state = s;
-    stateTimestamp = millis();
-    justEntered = true;
-}
-
-long SerialCommTask::elapsedTimeInState() {
-    return millis() - stateTimestamp;
-}
-
-bool SerialCommTask::checkAndSetJustEntered() {
-    bool result = justEntered;
-    if (justEntered) {
-        justEntered = false;
-    }
-    return result;
-}
-
-void SerialCommTask::log(const String& msg) {
-    Logger.log("[SerialComm] " + msg);
 }

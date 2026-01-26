@@ -19,7 +19,6 @@ void BlinkingTask::tick()
     case IDLE: {
         if (this->checkAndSetJustEntered()){
             pLed->switchOff();
-            Logger.log(F("[BT] IDLE"));
         }
         if (pContext->isDroneInside()){
             setState(OFF);
@@ -29,7 +28,6 @@ void BlinkingTask::tick()
     case OFF: {
         if (this->checkAndSetJustEntered()){
             pLed->switchOff();
-            Logger.log(F("[BT] OFF"));
         }
         if (pContext->isStopped()){
             setState(IDLE);
@@ -41,7 +39,6 @@ void BlinkingTask::tick()
     case ON: {
         if (this->checkAndSetJustEntered()){
             pLed->switchOn();
-            Logger.log(F("[BT] ON"));
         }
         if (pContext->isStopped()){ //TODO
             setState(IDLE);

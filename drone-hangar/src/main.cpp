@@ -31,11 +31,10 @@ DistanceDetectorTask *tDistance;
 PresenceDetectorTask *tPresence;
 BlinkingTask *tBlink;
 
-#define __TESTING_HW__
+// #define __TESTING_HW__
 
 void setup() {
     // 1. Init System
-    MsgService.init();
     Logger.log("::::: Drone Hangar System Booting :::::");
 
     sched.init(50); // Base period 50ms (MCD)
@@ -52,7 +51,7 @@ void setup() {
 
     // A. Serial Comm (Aperiodic - runs every cycle)
     tSerial = new SerialCommTask(pContext);
-    tSerial->init();
+    tSerial->init(50);
     sched.addTask(tSerial);
 
     // B. Logic Orchestrator (100ms)
