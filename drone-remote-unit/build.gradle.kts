@@ -23,10 +23,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.12")
     // Suppressions for SpotBugs
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
-    implementation(files("lib/jssc-2.9.6.jar"))
+    implementation("io.github.java-native:jssc:2.9.6")
 }
 
 application {
     // Define the main class for the application.
-    mainClass.set("it.unibo.drone.LaunchApp")
+    mainClass.set("it.unibo.drone.DashboardLauncher")
 }

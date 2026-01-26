@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 
 /**
  * Comm channel implementation based on serial port.
@@ -17,7 +18,7 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 
 	private SerialPort serialPort;
 	private BlockingQueue<String> queue;
-	private StringBuffer currentMsg = new StringBuffer("");
+	private StringBuilder currentMsg = new StringBuilder();
 
 	/**
 	 * Constructor.
@@ -29,38 +30,43 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 	public SerialCommChannel(String port, int rate) throws Exception {
 		queue = new ArrayBlockingQueue<String>(100);
 
-		serialPort = new SerialPort(port);
-		serialPort.openPort();
+		try {
+			serialPort = new SerialPort(port);
+			serialPort.openPort();
 
-		serialPort.setParams(rate,
-									SerialPort.DATABITS_8,
-									SerialPort.STOPBITS_1,
-									SerialPort.PARITY_NONE);
+			serialPort.setParams(rate,
+					SerialPort.DATABITS_8,
+					SerialPort.STOPBITS_1,
+					SerialPort.PARITY_NONE);
 
-		serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-											SerialPort.FLOWCONTROL_RTSCTS_OUT);
+			serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+					SerialPort.FLOWCONTROL_RTSCTS_OUT);
 
-		// serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
-		serialPort.addEventListener(this);
+			// serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
+			serialPort.addEventListener(this);
 
-		// Clear serial queue
-		queue.clear();
+			// Clear serial queue
+			queue.clear();
+
+		} catch (Exception ex) {
+			if (serialPort != null) {
+				serialPort.closePort();
+			}
+			throw ex;
+		}
 	}
 
 	@Override
 	public void sendMsg(String msg) {
-		char[] array = (msg+"\n").toCharArray();
-		byte[] bytes = new byte[array.length];
-		for (int i = 0; i < array.length; i++){
-			bytes[i] = (byte) array[i];
-		}
 		try {
-			synchronized (serialPort) {
-				serialPort.writeBytes(bytes);
-			}
-		} catch(Exception ex){
-			ex.printStackTrace();
-		}
+            synchronized (serialPort) {
+                String msgWithNewline = msg + "\n";
+                serialPort.writeBytes(msgWithNewline.getBytes());
+                System.out.println("[TX] " + msg);
+            }
+        } catch (SerialPortException ex) {
+            System.err.println("Error sending message: " + ex.getMessage());
+        }
 	}
 
 	@Override
@@ -93,33 +99,28 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 	public void serialEvent(SerialPortEvent event) {
 		/* if there are bytes received in the input buffer */
 		if (event.isRXCHAR()) {
-            try {
-            		String msg = serialPort.readString(event.getEventValue());
+			try {
+				String msg = serialPort.readString(event.getEventValue());
 
-            		msg = msg.replaceAll("\r", "");
+				msg = msg.replaceAll("\r", "");
 
-            		currentMsg.append(msg);
+				currentMsg.append(msg);
 
-            		boolean goAhead = true;
-
-        			while(goAhead) {
-        				String msg2 = currentMsg.toString();
-        				int index = msg2.indexOf("\n");
-            			if (index >= 0) {
-            				queue.put(msg2.substring(0, index));
-            				currentMsg = new StringBuffer("");
-            				if (index + 1 < msg2.length()) {
-            					currentMsg.append(msg2.substring(index + 1));
-            				}
-            			} else {
-            				goAhead = false;
-            			}
-        			}
-
-            } catch (Exception ex) {
-            		ex.printStackTrace();
-                System.out.println("Error in receiving string from COM-port: " + ex);
-            }
-        }
+				String buffer = currentMsg.toString();
+				int index = buffer.indexOf("\n");
+				// TODO: da vedere
+				while (index >= 0) {
+						String completeMsg = buffer.substring(0, index);
+						if (!completeMsg.isEmpty()) {
+							queue.put(completeMsg);
+						}
+						buffer = buffer.substring(index + 1);
+				}
+				currentMsg = new StringBuilder(buffer);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				System.out.println("Error in receiving string from COM-port: " + ex);
+			}
+		}
 	}
 }
