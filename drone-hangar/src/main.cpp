@@ -35,6 +35,8 @@ BlinkingTask *tBlink;
 
 void setup() {
     // 1. Init System
+    Serial.begin(SERIAL_BAUD_RATE);
+    delay(100); // Attendi un attimo per stabilizzare la serialeZ
     Logger.log("::::: Drone Hangar System Booting :::::");
 
     sched.init(50); // Base period 50ms (MCD)
@@ -63,6 +65,11 @@ void setup() {
     tHangar->init(100);
     sched.addTask(tHangar);
 
+    // Presence Detector (PIR - 200ms)
+    tPresence = new PresenceDetectorTask(pHWPlatform->getPir(), pContext);
+    tPresence->init(200);
+    sched.addTask(tPresence);
+
     // C. Actuators
     // Door Task (100ms movement update)
     tDoor = new DoorTask(pHWPlatform->getMotor(), pContext);
@@ -80,10 +87,6 @@ void setup() {
     tDistance->init(200);
     sched.addTask(tDistance);
 
-    // Presence Detector (PIR - 200ms)
-    tPresence = new PresenceDetectorTask(pHWPlatform->getPir(), pContext);
-    tPresence->init(200);
-    sched.addTask(tPresence);
 
     // E. Alarm Task //TODO
     /*

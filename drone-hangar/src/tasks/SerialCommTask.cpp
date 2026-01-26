@@ -15,8 +15,6 @@ SerialCommTask::SerialCommTask(Context* pContext) : pContext(pContext) {
 
 void SerialCommTask::init(int period) {
     PeriodicTask::init(period);
-    Serial.begin(SERIAL_BAUD_RATE);
-    delay(100); 
 }
 
 void SerialCommTask::tick() {

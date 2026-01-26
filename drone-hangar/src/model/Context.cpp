@@ -19,7 +19,6 @@ void Context::confirmDoorClosed() {
     doorMoving = false;
     doorOpen = false;
 }
-
 void Context::confirmDoorOpened() {
     doorMoving = false;
     doorOpen = true;
@@ -37,6 +36,7 @@ void Context::confirmDroneInside() {
 void Context::confirmDroneOut() {
     droneIsInsideFlag = false;
     takeOffCommandReceived = false;
+    droneNear = false; // Reset sensor logic on exit
 }
 
 bool Context::isDroneInside() { return droneIsInsideFlag; }
@@ -46,40 +46,27 @@ void Context::confirmDroneNear() { droneNear = true; }
 void Context::confirmDroneFar() { droneNear = false; }
 bool Context::isDroneNear() { return droneNear; }
 
-void Context::confirmTakeOffCommandReceived() {
-    takeOffCommandReceived = true;
-}
-
-bool Context::isTakeOffCommandReceived() {
-    return takeOffCommandReceived;
-}
+void Context::confirmTakeOffCommandReceived() { takeOffCommandReceived = true; }
+bool Context::isTakeOffCommandReceived() { return takeOffCommandReceived; }
 
 void Context::confirmLandingCommandReceived() {
     landingCommandReceived = true;
+    // --- FORCE RESET ---
+    droneNear = false; // This prevents the door from opening automatically!
 }
-
-bool Context::isLandingCommandReceived() {
-    return landingCommandReceived;
-}
+bool Context::isLandingCommandReceived() { return landingCommandReceived; }
 
 void Context::triggerPreAlarm() { preAlarm = true; }
 bool Context::isPreAlarm() { return preAlarm; }
 
-void Context::triggerAlarm() {
-    alarm = true;
-    preAlarm = false;
-}
+void Context::triggerAlarm() { alarm = true; preAlarm = false; }
 bool Context::isAlarm() { return alarm; }
 
-void Context::confirmResetButtonPressed() {
-    resetButtonPressed = true;
-    alarm = false;
-    preAlarm = false;
-}
+void Context::confirmResetButtonPressed() { resetButtonPressed = true; alarm = false; preAlarm = false; }
 void Context::clearResetButtonPressed() { resetButtonPressed = false; }
 bool Context::isResetButtonPressed() { return resetButtonPressed; }
 
-void Context::confirmAlarmSendedToDRU() { /*TODO*/ }
+void Context::confirmAlarmSendedToDRU() { }
 bool Context::isAlarmSendedToDRU() { return false; }
 bool Context::isPreAlarmSendedToDRU() { return false; }
 

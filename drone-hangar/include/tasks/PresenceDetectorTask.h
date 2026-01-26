@@ -9,6 +9,7 @@
 class PresenceDetectorTask : public PeriodicTask {
 public:
     PresenceDetectorTask(Pir* pPir, Context* pContext);
+    void init(int period);
     void tick();
 
 private:

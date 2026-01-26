@@ -16,12 +16,11 @@ void DoorTask::tick() {
             if (checkAndSetJustEntered()) {
                 log("CLOSED");
                 pServo->setPosition(DOOR_CLOSED_ANGLE);
-                currentPosition = DOOR_CLOSED_ANGLE;
                 pContext->confirmDoorClosed();
             }
-
-            // Check if door should open
-            if (pContext->isTakeOffCommandReceived()) {
+            // Open on Takeoff OR (Landing AND PIR detected)
+            if (pContext->isTakeOffCommandReceived() || 
+               (pContext->isLandingCommandReceived() && pContext->isDroneNear())) {
                 setState(OPENING);
             }
             break;
@@ -31,14 +30,9 @@ void DoorTask::tick() {
             if (checkAndSetJustEntered()) {
                 log("OPENING");
                 pServo->setPosition(DOOR_OPEN_ANGLE);
-                currentPosition = DOOR_OPEN_ANGLE;
                 pContext->openDoor();
             }
-
-            // Wait for servo to reach position (simple delay)
-            if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME) {
-                setState(OPEN);
-            }
+            if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME) setState(OPEN);
             break;
         }
 
@@ -47,9 +41,14 @@ void DoorTask::tick() {
                 log("OPEN");
                 pContext->confirmDoorOpened();
             }
-
-            if(pContext->isDroneOut()) {
+            // Close logic: 
+            // 1. Drone is OUT and NOT landing (Takeoff done)
+            if (pContext->isDroneOut() && !pContext->isLandingCommandReceived()) {
                 setState(CLOSING);
+            } 
+            // 2. Drone is INSIDE (Landing done)
+            else if (pContext->isDroneInside()) {
+                 setState(CLOSING);
             }
             break;
         }
@@ -58,37 +57,15 @@ void DoorTask::tick() {
             if (checkAndSetJustEntered()) {
                 log("CLOSING");
                 pServo->setPosition(DOOR_CLOSED_ANGLE);
-                currentPosition = DOOR_CLOSED_ANGLE;
                 pContext->closeDoor();
             }
-
-            // Wait for servo to reach position
-            if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME) {
-                setState(CLOSED);
-            }
+            if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME) setState(CLOSED);
             break;
         }
     }
 }
 
-void DoorTask::setState(DoorState s) {
-    state = s;
-    stateTimestamp = millis();
-    justEntered = true;
-}
-
-long DoorTask::elapsedTimeInState() {
-    return millis() - stateTimestamp;
-}
-
-bool DoorTask::checkAndSetJustEntered() {
-    bool result = justEntered;
-    if (justEntered) {
-        justEntered = false;
-    }
-    return result;
-}
-
-void DoorTask::log(const String& msg) {
-    Logger.log("[DoorTask] " + msg);
-}
+void DoorTask::setState(DoorState s) { state = s; stateTimestamp = millis(); justEntered = true; }
+long DoorTask::elapsedTimeInState() { return millis() - stateTimestamp; }
+bool DoorTask::checkAndSetJustEntered() { bool result = justEntered; if (justEntered) justEntered = false; return result; }
+void DoorTask::log(const String& msg) { Logger.log("[DoorTask] " + msg); }
