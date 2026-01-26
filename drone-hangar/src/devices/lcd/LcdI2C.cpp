@@ -20,7 +20,6 @@ void LcdI2C::setCursor(int col, int row) {
 }
 
 void LcdI2C::print(const String& text) {
-    lcd->setCursor(0, 0);
     lcd->print(text);
 }
 

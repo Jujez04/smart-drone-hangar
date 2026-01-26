@@ -1,40 +1,62 @@
 #ifndef __CONTEXT__
 #define __CONTEXT__
 
-class Context {
+#include <Arduino.h>
 
+class Context{
 public:
+    Context();
+
     void closeDoor();
     void openDoor();
     void confirmDoorClosed();
     void confirmDoorOpened();
+
     void confirmDroneInside();
     void confirmDroneOut();
     void confirmDroneNear();
     void confirmDroneFar();
+
     void confirmTakeOffCommandReceived();
     void confirmLandingCommandReceived();
 
-    bool isStopped(); // Blink: Think about it
+    void triggerPreAlarm();
+    void triggerAlarm();
+    void confirmResetButtonPressed();
+    void clearResetButtonPressed();
+    void confirmAlarmSendedToDRU();
+
+    bool isStopped();
     bool isDoorClosed();
     bool isDoorOpen();
+
     bool isDroneOut();
     bool isDroneInside();
     bool isDroneNear();
+
     bool isTakeOffCommandReceived();
     bool isLandingCommandReceived();
+    bool isPreAlarm();
+    bool isAlarm();
+    bool isResetButtonPressed();
+    bool isAlarmSendedToDRU();
+    bool isPreAlarmSendedToDRU();
+
+    String getStatusMessageForDRU();
+
 private:
-    bool doorOpen = true;
+    bool doorOpen;
     bool doorMoving;
+    bool droneNear;
 
-    //PIR
-    bool droneNear = false;
+    bool droneIsInsideFlag;
 
-    bool takeOffCommandReceived = false;
-    bool landingCommandReceived = false;
+    bool takeOffCommandReceived;
+    bool landingCommandReceived;
 
-    bool isPreAlarm;
-    bool isAlarm;
+    bool preAlarm;
+    bool alarm;
+    bool resetButtonPressed;
 };
 
 #endif

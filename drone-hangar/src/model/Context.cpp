@@ -1,2 +1,93 @@
 #include "model/Context.h"
 
+Context::Context() {
+    doorOpen = false;
+    doorMoving = false;
+    droneNear = false;
+    droneIsInsideFlag = true;
+    takeOffCommandReceived = false;
+    landingCommandReceived = false;
+    preAlarm = false;
+    alarm = false;
+    resetButtonPressed = false;
+}
+
+void Context::closeDoor() { doorMoving = true; }
+void Context::openDoor() { doorMoving = true; }
+
+void Context::confirmDoorClosed() {
+    doorMoving = false;
+    doorOpen = false;
+}
+
+void Context::confirmDoorOpened() {
+    doorMoving = false;
+    doorOpen = true;
+}
+
+bool Context::isDoorClosed() { return !doorOpen && !doorMoving; }
+bool Context::isDoorOpen() { return doorOpen && !doorMoving; }
+bool Context::isStopped() { return !doorMoving; }
+
+void Context::confirmDroneInside() {
+    droneIsInsideFlag = true;
+    landingCommandReceived = false;
+}
+
+void Context::confirmDroneOut() {
+    droneIsInsideFlag = false;
+    takeOffCommandReceived = false;
+}
+
+bool Context::isDroneInside() { return droneIsInsideFlag; }
+bool Context::isDroneOut() { return !droneIsInsideFlag; }
+
+void Context::confirmDroneNear() { droneNear = true; }
+void Context::confirmDroneFar() { droneNear = false; }
+bool Context::isDroneNear() { return droneNear; }
+
+void Context::confirmTakeOffCommandReceived() {
+    takeOffCommandReceived = true;
+}
+
+bool Context::isTakeOffCommandReceived() {
+    return takeOffCommandReceived;
+}
+
+void Context::confirmLandingCommandReceived() {
+    landingCommandReceived = true;
+}
+
+bool Context::isLandingCommandReceived() {
+    return landingCommandReceived;
+}
+
+void Context::triggerPreAlarm() { preAlarm = true; }
+bool Context::isPreAlarm() { return preAlarm; }
+
+void Context::triggerAlarm() {
+    alarm = true;
+    preAlarm = false;
+}
+bool Context::isAlarm() { return alarm; }
+
+void Context::confirmResetButtonPressed() {
+    resetButtonPressed = true;
+    alarm = false;
+    preAlarm = false;
+}
+void Context::clearResetButtonPressed() { resetButtonPressed = false; }
+bool Context::isResetButtonPressed() { return resetButtonPressed; }
+
+void Context::confirmAlarmSendedToDRU() { /*TODO*/ }
+bool Context::isAlarmSendedToDRU() { return false; }
+bool Context::isPreAlarmSendedToDRU() { return false; }
+
+String Context::getStatusMessageForDRU() {
+    if (alarm) return "ALARM";
+    if (preAlarm) return "PRE_ALARM";
+    if (doorMoving && takeOffCommandReceived) return "TAKING_OFF";
+    if (doorMoving && landingCommandReceived) return "LANDING";
+    if (!droneIsInsideFlag) return "DRONE_OUT";
+    return "DRONE_INSIDE";
+}

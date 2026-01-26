@@ -66,33 +66,109 @@ TempSensor *HWPlatform::getTempSensor() {
   return pTemp;
 }
 
-Display *HWPlatform::getLcd() {
+LcdI2C *HWPlatform::getLcd() {
   return pLcd;
 }
 
 void HWPlatform::test() {
-
-  pLcd->setCursor(0, 0);
-  pLcd->print("TEST");
-
-  pMotor->setPosition(90);
-
-  pL1->switchOn();
-  delay(500);
-  pL1->switchOff();
-
-  pL2->switchOn();
-  delay(500);
-  pL2->switchOff();
-
-  pL3->switchOn();
-  delay(500);
-  pL3->switchOff();
-
-  float t = pTemp->getTemperature();
-  float s = pSonar->getDistance();
   pPir->sync();
-  const char *p = (pPir->isDetected() ? "RILEVATO" : "NON RILEVATO");
-  const char *b = (pButton->isPressed() ? "PREMUTO" : "NON PREMUTO");
-  Logger.log("temp: " + String(t) + " | dist: " + String(s) + " | pir: " + p + " | btn: " + b);
+  bool pirDetected = pPir->isDetected();
+  float temp = pTemp->getTemperature();
+  float dist = pSonar->getDistance();
+  bool btnPressed = pButton->isPressed();
+
+  if (pirDetected)
+    pL1->switchOn();
+  else
+    pL1->switchOff();
+
+  if (btnPressed)
+    pL2->switchOn();
+  else
+    pL2->switchOff();
+
+  static bool heartbeat = false;
+  heartbeat = !heartbeat;
+  if (heartbeat)
+    pL3->switchOn();
+  else
+    pL3->switchOff();
+
+  String logMsg = String("Temp:") + temp +
+                  " | Dist:" + dist +
+                  " | PIR:" + (pirDetected ? "SI" : "NO") +
+                  " | BTN:" + (btnPressed ? "SI" : "NO");
+  Logger.log(logMsg);
+}
+
+void HWPlatform::testServo() {
+  enum ServoTestState {
+    CLOSED,
+    OPENING,
+    OPEN,
+    CLOSING
+  };
+
+  static ServoTestState state = CLOSED;
+  static unsigned long stateTime = 0;
+  static bool entered = true;
+  static bool lastBtnState = false;
+  bool currentBtnState = pButton->isPressed();
+  bool btnPressedNow = currentBtnState && !lastBtnState;
+  lastBtnState = currentBtnState;
+
+  unsigned long elapsed = millis() - stateTime;
+
+  switch (state) {
+  case CLOSED:
+    if (entered) {
+      pMotor->setPosition(0);
+      Logger.log("[Servo] CLOSED (0 deg)");
+      entered = false;
+    }
+    if (btnPressedNow) {
+      state = OPENING;
+      stateTime = millis();
+      entered = true;
+    }
+    break;
+
+  case OPENING:
+    if (entered) {
+      pMotor->setPosition(180);
+      Logger.log("[Servo] OPENING -> 180 deg");
+      entered = false;
+    }
+    if (elapsed >= 2000) {
+      state = OPEN;
+      stateTime = millis();
+      entered = true;
+    }
+    break;
+
+  case OPEN:
+    if (entered) {
+      Logger.log("[Servo] OPEN (Waiting...)");
+      entered = false;
+    }
+    if (btnPressedNow || elapsed >= 2000) {
+      state = CLOSING;
+      stateTime = millis();
+      entered = true;
+    }
+    break;
+
+  case CLOSING:
+    if (entered) {
+      pMotor->setPosition(0);
+      Logger.log("[Servo] CLOSING -> 0 deg");
+      entered = false;
+    }
+    if (elapsed >= 2000) {
+      state = CLOSED;
+      stateTime = millis();
+      entered = true;
+    }
+    break;
+  }
 }
