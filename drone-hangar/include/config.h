@@ -43,7 +43,7 @@
 #define DOOR_OPEN_ANGLE 90
 #define DOOR_MOVEMENT_TIME 2000
 
-#define D1 0.50 
+#define D1 0.20 
 
 // D2: Distanza sotto la quale il drone è considerato "ATTERRATO/DENTRO" (es. 15cm)
 #define D2 0.15 
