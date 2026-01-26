@@ -24,12 +24,14 @@ public:
     bool isTakeOffCommandReceived();
     bool isLandingCommandReceived();
 private:
-    bool isDoorOpen;
-    bool isDoorMoving;
-    bool isDoorClosed;
+    bool doorOpen = true;
+    bool doorMoving;
 
     //PIR
-    bool isDroneNear;
+    bool droneNear = false;
+
+    bool takeOffCommandReceived = false;
+    bool landingCommandReceived = false;
 
     bool isPreAlarm;
     bool isAlarm;

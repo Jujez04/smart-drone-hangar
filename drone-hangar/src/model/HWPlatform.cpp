@@ -32,7 +32,6 @@ void HWPlatform::init() {
   pPir->calibrate();
   pMotor->on();
   pMotor->setPosition(0);
-  pMotor->off();
 }
 
 Button *HWPlatform::getButton() {
@@ -76,10 +75,7 @@ void HWPlatform::test() {
   pLcd->setCursor(0, 0);
   pLcd->print("TEST");
 
-  pMotor->on();
-  pMotor->setPosition(180);
-  delay(500);
-  pMotor->setPosition(0);
+  pMotor->setPosition(90);
 
   pL1->switchOn();
   delay(500);
