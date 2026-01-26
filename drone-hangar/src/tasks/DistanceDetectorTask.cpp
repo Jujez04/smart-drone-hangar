@@ -9,42 +9,54 @@ DistanceDetectorTask::DistanceDetectorTask(Sonar* pSonar, Context* pContext)
 
 void DistanceDetectorTask::tick() {
     switch (state) {
-        case IDLE: {
-            if (checkAndSetJustEntered()) {
-                log("IDLE - Distance monitoring disabled");
-            }
-
-            // Activate when monitoring is needed
-            if (pContext->isTakeOffCommandReceived()) {
+        case IDLE:
+            timeAboveD1 = 0;
+            timeBelowD2 = 0;
+            if (pContext->isTakeOffCommandReceived() || pContext->isLandingCommandReceived() || pContext->isDoorOpen()) 
                 setState(ACTIVE);
-            }
             break;
-        }
 
-        case ACTIVE: {
-            if (checkAndSetJustEntered()) {
-                log("ACTIVE - Distance monitoring enabled");
-            }
-
-            // Deactivate when monitoring is not needed
-            if (!pContext->isDroneInside()) {
+        case ACTIVE:
+            if (pContext->isDroneInside() && !pContext->isTakeOffCommandReceived() && pContext->isDoorClosed()) {
                 setState(IDLE);
-            } else {
-                float distance = readDistance();
-                if (isValidReading(distance)) {
-                    if(distance > D1) {
+                break;
+            }
+
+            float distance = readDistance();
+            
+            // --- FILTRO ANTIRUMORE FONDAMENTALE ---
+            // Se leggiamo 0 o > 4m, ignoriamo la lettura (non resettiamo il timer!)
+            if (distance <= 0.01 || distance > 4.0) return; 
+            // --------------------------------------
+
+            // Logica Takeoff
+            if (distance > D1) {
+                if (timeAboveD1 == 0) timeAboveD1 = millis();
+                if (millis() - timeAboveD1 >= T1) {
+                    if (!pContext->isDroneOut()) {
+                        Logger.log("Drone OUT confirmed!"); // Debug
                         pContext->confirmDroneOut();
+                        timeAboveD1 = 0;
                     }
-                    if (distance < D2)
-                    {
-                        pContext->confirmDroneInside();
-                    }
-                } else {
-                    log("WARNING: Invalid sonar reading ignored");
                 }
+            } else {
+                timeAboveD1 = 0; // Resetta solo se la lettura è valida ma sotto soglia
+            }
+
+            // Logica Landing
+            if (distance < D2) {
+                if (timeBelowD2 == 0) timeBelowD2 = millis();
+                if (millis() - timeBelowD2 >= T2) {
+                    if (pContext->isDroneOut()) {
+                        Logger.log("Drone INSIDE confirmed!"); // Debug
+                        pContext->confirmDroneInside();
+                        timeBelowD2 = 0;
+                    }
+                }
+            } else {
+                timeBelowD2 = 0;
             }
             break;
-        }
     }
 }
 

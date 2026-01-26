@@ -13,40 +13,31 @@ void BlinkingTask::init(int period) {
     PeriodicTask::init(period);
 }
 
-void BlinkingTask::tick()
-{
-    switch (state){
-    case IDLE: {
-        if (this->checkAndSetJustEntered()){
-            pLed->switchOff();
-        }
-        if (pContext->isDroneInside()){
-            setState(OFF);
-        }
-        break;
-    }
-    case OFF: {
-        if (this->checkAndSetJustEntered()){
-            pLed->switchOff();
-        }
-        if (pContext->isStopped()){
-            setState(IDLE);
-        } else {
-             setState(ON);
-        }
-        break;
-    }
-    case ON: {
-        if (this->checkAndSetJustEntered()){
-            pLed->switchOn();
-        }
-        if (pContext->isStopped()){ //TODO
-            setState(IDLE);
-        } else {
-            setState(OFF);
-        }
-        break;
-    }
+void BlinkingTask::tick() {
+    switch (state) {
+        case IDLE:
+            if (checkAndSetJustEntered()) pLed->switchOff();
+            if (pContext->isTakeOffCommandReceived()) setState(ON);
+            break;
+
+        case OFF:
+            if (checkAndSetJustEntered()) pLed->switchOff();
+            // CORREZIONE: Passa a ON dopo il tempo stabilito
+            if (elapsedTimeInState() >= BLINK_PERIOD) setState(ON);
+            
+            // Uscita
+            if (pContext->isDroneOut() || (pContext->isDroneInside() && !pContext->isTakeOffCommandReceived())) 
+                setState(IDLE);
+            break;
+
+        case ON:
+            if (checkAndSetJustEntered()) pLed->switchOn();
+            // CORREZIONE: Passa a OFF dopo il tempo stabilito (questo mancava!)
+            if (elapsedTimeInState() >= BLINK_PERIOD) setState(OFF);
+            
+            // Uscita immediata se il drone è fuori
+            if (pContext->isDroneOut()) setState(IDLE);
+            break;
     }
 }
 

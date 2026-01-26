@@ -12,6 +12,9 @@ public:
     void tick();
 
 private:
+    long timeAboveD1;
+    long timeBelowD2;
+
     enum DistanceDetectorState {
         IDLE,        // Not monitoring distance
         ACTIVE       // Actively reading sonar

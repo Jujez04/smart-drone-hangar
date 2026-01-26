@@ -68,6 +68,8 @@
 // T4: Tempo sopra Temp2 per scattare Allarme (ms)
 #define T4 3000
 
+#define BLINK_PERIOD 500  // Periodo di lampeggio LED (ms)
+
 // ==========================================
 // 4. SCHEDULER PERIODS (Millisecondi)
 // ==========================================
