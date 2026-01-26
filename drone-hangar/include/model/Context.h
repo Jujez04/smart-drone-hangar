@@ -1,8 +1,6 @@
 #ifndef __CONTEXT__
 #define __CONTEXT__
 
-
-
 class Context {
 
 public:
@@ -14,6 +12,8 @@ public:
     void confirmDroneOut();
     void confirmDroneNear();
     void confirmDroneFar();
+    void confirmTakeOffCommandReceived();
+    void confirmLandingCommandReceived();
 
     bool isStopped(); // Blink: Think about it
     bool isDoorClosed();
