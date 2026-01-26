@@ -46,12 +46,6 @@ public class DashboardLauncher {
             logView.display();
             dashboardView.display();
 
-            // Shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                System.out.println("Shutting down...");
-                controller.close();
-            }));
-
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
                 null,
@@ -65,26 +59,10 @@ public class DashboardLauncher {
     }
 
     private static String selectSerialPort(String[] args) {
-        // Option 1: Command line argument
+        // Command line argument
         if (args.length > 0) {
             return args[0];
         }
-
-        // Option 2: Show dialog
-        String[] commonPorts = {
-            "COM3", "COM4", "COM5", "COM6",  // Windows
-            "/dev/ttyUSB0", "/dev/ttyUSB1",  // Linux
-            "/dev/cu.usbmodem14101", "/dev/cu.usbserial-14110"  // macOS
-        };
-
-        return (String) JOptionPane.showInputDialog(
-            null,
-            "Select Arduino serial port:",
-            "Serial Port Selection",
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            commonPorts,
-            commonPorts[0]
-        );
+        return "COM6"; // Default port
     }
 }

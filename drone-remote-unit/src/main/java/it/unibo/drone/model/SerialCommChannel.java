@@ -9,10 +9,8 @@ import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
 /**
- * Comm channel implementation based on serial port.
- *
- * @author aricci
- *
+ * Canale di comunicazione seriale robusto.
+ * Corretto per evitare StringIndexOutOfBoundsException.
  */
 public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 
@@ -20,20 +18,14 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 	private BlockingQueue<String> queue;
 	private StringBuilder currentMsg = new StringBuilder();
 
-	/**
-	 * Constructor.
-	 *
-	 * @param port the serial port name
-	 * @param rate the baud rate
-	 * @throws Exception
-	 */
 	public SerialCommChannel(String port, int rate) throws Exception {
 		queue = new ArrayBlockingQueue<String>(100);
 
-		try {
-			serialPort = new SerialPort(port);
-			serialPort.openPort();
+		// Inizializza la porta ma non chiamare close() qui!
+		serialPort = new SerialPort(port);
 
+		try {
+			serialPort.openPort();
 			serialPort.setParams(rate,
 					SerialPort.DATABITS_8,
 					SerialPort.STOPBITS_1,
@@ -42,16 +34,10 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 			serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
 					SerialPort.FLOWCONTROL_RTSCTS_OUT);
 
-			// serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
 			serialPort.addEventListener(this);
 
-			// Clear serial queue
-			queue.clear();
-
-		} catch (Exception ex) {
-			if (serialPort != null) {
-				serialPort.closePort();
-			}
+		} catch (SerialPortException ex) {
+			System.err.println("Errore apertura porta: " + ex.getMessage());
 			throw ex;
 		}
 	}
@@ -59,14 +45,14 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 	@Override
 	public void sendMsg(String msg) {
 		try {
-            synchronized (serialPort) {
-                String msgWithNewline = msg + "\n";
-                serialPort.writeBytes(msgWithNewline.getBytes());
-                System.out.println("[TX] " + msg);
-            }
-        } catch (SerialPortException ex) {
-            System.err.println("Error sending message: " + ex.getMessage());
-        }
+			synchronized (serialPort) {
+				String msgWithNewline = msg + "\n";
+				serialPort.writeBytes(msgWithNewline.getBytes());
+				// System.out.println("[TX] " + msg); // Decommenta per debug TX
+			}
+		} catch (SerialPortException ex) {
+			System.err.println("Error sending message: " + ex.getMessage());
+		}
 	}
 
 	@Override
@@ -79,47 +65,65 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 		return !queue.isEmpty();
 	}
 
-	/**
-	 * This should be called when you stop using the port.
-	 * This will prevent port locking on platforms like Linux.
-	 */
 	@Override
 	public void close() {
 		try {
 			if (serialPort != null) {
 				serialPort.removeEventListener();
-				serialPort.closePort();
+				if (serialPort.isOpened()) {
+					serialPort.closePort();
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	/**
+	 * Questo è il metodo che causava l'errore.
+	 * Questa versione è riscritta per essere sicura.
+	 */
 	@Override
 	public void serialEvent(SerialPortEvent event) {
-		/* if there are bytes received in the input buffer */
 		if (event.isRXCHAR()) {
 			try {
+				// Leggi la stringa dal buffer
 				String msg = serialPort.readString(event.getEventValue());
 
+				// Se msg è null (può capitare), esci
+				if (msg == null)
+					return;
+
+				// Rimuovi ritorni a capo Windows strani (\r)
 				msg = msg.replaceAll("\r", "");
 
+				// Aggiungi al buffer globale
 				currentMsg.append(msg);
 
-				String buffer = currentMsg.toString();
-				int index = buffer.indexOf("\n");
-				// TODO: da vedere
+				// CERCA E ESTRAI I MESSAGGI COMPLETI
+				// Continua finché trovi un "a capo" (\n)
+				int index = currentMsg.indexOf("\n");
+
 				while (index >= 0) {
-						String completeMsg = buffer.substring(0, index);
-						if (!completeMsg.isEmpty()) {
-							queue.put(completeMsg);
-						}
-						buffer = buffer.substring(index + 1);
+					// 1. Estrai il messaggio dall'inizio fino al \n
+					String completeMsg = currentMsg.substring(0, index);
+
+					// 2. Aggiungi alla coda solo se non è vuoto
+					if (!completeMsg.isEmpty()) {
+						queue.put(completeMsg);
+					}
+
+					// 3. CANCELLA la parte processata dal buffer (incluso il \n)
+					// Questo previene l'errore di memoria/indice
+					currentMsg.delete(0, index + 1);
+
+					// 4. Cerca il prossimo \n nel buffer rimanente
+					index = currentMsg.indexOf("\n");
 				}
-				currentMsg = new StringBuilder(buffer);
+
 			} catch (Exception ex) {
 				ex.printStackTrace();
-				System.out.println("Error in receiving string from COM-port: " + ex);
+				System.out.println("Error in serialEvent: " + ex.getMessage());
 			}
 		}
 	}

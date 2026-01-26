@@ -38,7 +38,7 @@ public class MonitoringAgent extends Thread {
                 } else if (msg.startsWith(LOG_PREFIX)) {
                     String logMsg = msg.substring(LOG_PREFIX.length());
                     logger.log("[HANGAR] " + logMsg);
-                    
+
                 } else {
                     // Unknown format
                     logger.log("[RAW] " + msg);
@@ -61,9 +61,9 @@ public class MonitoringAgent extends Thread {
             updateDroneStatus(status);
 
         } else if (msg.startsWith("ALARM")) {
-            view.setHangarStatus("🚨 ALARM");
+            view.setHangarStatus("ALARM");
             view.setDroneStatus("EMERGENCY");
-            logger.log("⚠️⚠️⚠️ CRITICAL ALARM RECEIVED FROM HANGAR!");
+            logger.log("CRITICAL ALARM RECEIVED FROM HANGAR!");
 
         } else if (msg.startsWith("TEMP:")) {
             try {

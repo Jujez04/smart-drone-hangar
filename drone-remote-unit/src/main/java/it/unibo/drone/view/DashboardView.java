@@ -127,7 +127,7 @@ public class DashboardView extends JFrame implements ActionListener {
         takeoffButton = new JButton("TAKEOFF");
         takeoffButton.setFont(new Font("Arial", Font.BOLD, 14));
         takeoffButton.setBackground(new Color(76, 175, 80));
-        takeoffButton.setForeground(Color.WHITE);
+        takeoffButton.setForeground(Color.BLACK);
         takeoffButton.setFocusPainted(false);
         takeoffButton.addActionListener(this);
         panel.add(takeoffButton);
@@ -136,7 +136,7 @@ public class DashboardView extends JFrame implements ActionListener {
         landingButton = new JButton("LANDING");
         landingButton.setFont(new Font("Arial", Font.BOLD, 14));
         landingButton.setBackground(new Color(33, 150, 243));
-        landingButton.setForeground(Color.WHITE);
+        landingButton.setForeground(Color.BLACK);
         landingButton.setFocusPainted(false);
         landingButton.addActionListener(this);
         panel.add(landingButton);
