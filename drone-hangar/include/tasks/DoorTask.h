@@ -1,12 +1,12 @@
 #ifndef __DOOR_TASK__
 #define __DOOR_TASK__
 
-#include "kernel/Task.h"
+#include "kernel/PeriodicTask.h"
 #include "model/Context.h"
 #include "devices/servo/ServoMotor.h"
 #include <Arduino.h>
 
-class DoorTask : public Task {
+class DoorTask : public PeriodicTask {
 public:
     DoorTask(ServoMotor* pServo, Context* pContext);
     void tick();

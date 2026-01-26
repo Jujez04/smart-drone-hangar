@@ -2,13 +2,19 @@
 #include <Arduino.h>
 #include "config.h"
 #include "kernel/Logger.h"
+#include "tasks/BlinkingTask.h"
 
 BlinkingTask::BlinkingTask(Led* pLed, Context* pContext):
     pContext(pContext), pLed(pLed){
     setState(IDLE);
 }
 
-void BlinkingTask::tick(){
+void BlinkingTask::init(int period) {
+    PeriodicTask::init(period);
+}
+
+void BlinkingTask::tick()
+{
     switch (state){
     case IDLE: {
         if (this->checkAndSetJustEntered()){
@@ -46,7 +52,6 @@ void BlinkingTask::tick(){
     }
     }
 }
-
 
 void BlinkingTask::setState(BlinkingState s){
     state = s;

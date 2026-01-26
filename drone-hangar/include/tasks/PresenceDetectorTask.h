@@ -1,12 +1,12 @@
 #ifndef __PRESENCE_DETECTOR_TASK__
 #define __PRESENCE_DETECTOR_TASK__
 
-#include "kernel/Task.h"
+#include "kernel/PeriodicTask.h"
 #include "model/Context.h"
 #include "devices/pir/Pir.h"
 #include <Arduino.h>
 
-class PresenceDetectorTask : public Task {
+class PresenceDetectorTask : public PeriodicTask {
 public:
     PresenceDetectorTask(Pir* pPir, Context* pContext);
     void tick();

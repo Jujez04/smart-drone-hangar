@@ -7,7 +7,7 @@ class PeriodicTask : public Task {
 public:
     PeriodicTask() : Task(PERIODIC) {}
 
-    void init(int period) {
+    virtual void init(int period) {
         this->period = period;
         timeElapsed = 0;
         active = true;

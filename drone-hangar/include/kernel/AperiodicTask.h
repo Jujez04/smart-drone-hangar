@@ -7,7 +7,7 @@ class AperiodicTask : public Task {
 public:
     AperiodicTask() : Task(APERIODIC) {}
 
-    void init() {
+    virtual void init() {
         active = true;
         completed = false;
     }

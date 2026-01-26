@@ -7,14 +7,7 @@
 #include "devices/led/Led.h"
 #include "devices/lcd/LcdI2C.h"
 
-enum HangarState {
-    DRONE_INSIDE,
-    TAKE_OFF,
-    DRONE_OUT,
-    LANDING,
-    PRE_ALARM,
-    ALARM
-};
+
 
 class HangarTask: public PeriodicTask {
 
@@ -23,6 +16,15 @@ public:
     void tick();
 
 private:
+    enum HangarState {
+        DRONE_INSIDE,
+        TAKE_OFF,
+        DRONE_OUT,
+        LANDING,
+        PRE_ALARM,
+        ALARM
+    };
+
     void setState(HangarState state);
     long elapsedTimeInState();
     bool checkAndSetJustEntered();

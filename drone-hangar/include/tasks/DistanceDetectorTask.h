@@ -1,12 +1,12 @@
 #ifndef __DISTANCE_DETECTOR_TASK__
 #define __DISTANCE_DETECTOR_TASK__
 
-#include "kernel/Task.h"
+#include "kernel/PeriodicTask.h"
 #include "model/Context.h"
 #include "devices/sonar/Sonar.h"
 #include <Arduino.h>
 
-class DistanceDetectorTask : public Task {
+class DistanceDetectorTask : public PeriodicTask {
 public:
     DistanceDetectorTask(Sonar* pSonar, Context* pContext);
     void tick();

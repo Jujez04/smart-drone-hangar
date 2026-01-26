@@ -1,21 +1,21 @@
 #ifndef __SERIAL_COMM_TASK__
 #define __SERIAL_COMM_TASK__
 
-#include "kernel/Task.h"
-#include "kernel/MsgService.h"
+#include "kernel/AperiodicTask.h"
 #include "model/Context.h"
 #include <Arduino.h>
 
-class SerialCommTask : public Task {
+class SerialCommTask : public AperiodicTask {
 public:
     SerialCommTask(Context* pContext);
-    void tick();
+    void init() override;
+    void tick() override;
 
 private:
-    enum SerialCommState {
-        LISTENING,      // Waiting for messages from DRU
-        PROCESSING,     // Processing received command
-        SENDING         // Sending status/alarm to DRU
+    enum SerialCommState{
+        LISTENING,
+        PROCESSING,
+        SENDING
     } state;
 
     void setState(SerialCommState state);
@@ -26,13 +26,17 @@ private:
     long stateTimestamp;
     bool justEntered;
 
-    MsgServiceClass* pMsgService;
     Context* pContext;
+    String inputBuffer;
 
-    // Helper methods
+    static const String APP_PREFIX;
+    static const String LOG_PREFIX;
+
+    void readSerial();
     void handleIncomingMessage(const String& msg);
     void sendStatusToDRU();
     void sendAlarmToDRU();
+    void sendLogMessage(const String& msg);
     bool parseCommand(const String& msg, String& command);
 };
 
