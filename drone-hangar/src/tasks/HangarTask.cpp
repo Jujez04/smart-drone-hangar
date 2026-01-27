@@ -105,7 +105,6 @@ bool HangarTask::checkAndSetJustEntered() {
     return result;
 }
 
-// CORREZIONE CRUCIALE QUI SOTTO
 void HangarTask::setState(HangarState newState) {
     this->state = newState;
     this->stateTimestamp = millis();
