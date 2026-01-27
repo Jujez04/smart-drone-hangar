@@ -30,7 +30,7 @@ void DoorTask::tick()
         bool validTakeoff = pContext->isTakeOffCommandReceived() && pContext->isDroneInside();
         bool validLanding = pContext->isLandingCommandReceived() && pContext->isDroneNear();
 
-        if (validTakeoff || validLanding)
+        if ((validTakeoff || validLanding) && pContext->isCommandsEnabled())
         {
             setState(OPENING);
         }
@@ -48,7 +48,6 @@ void DoorTask::tick()
         static long lastStepTime = 0;
         if (millis() - lastStepTime >= SERVO_STEP_DELAY) {
             lastStepTime = millis();
-            
             if (currentPosition < DOOR_OPEN_ANGLE) {
                 currentPosition++;
                 pServo->setPosition(currentPosition);

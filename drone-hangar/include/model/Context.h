@@ -27,25 +27,21 @@ public:
     void triggerAlarm();
     void confirmResetButtonPressed();
     void clearResetButtonPressed();
-    void confirmAlarmSendedToDRU();
     void clearPreAlarm();
     void clearAlarm();
     bool isStopped();
     bool isDoorClosed();
     bool isDoorOpen();
-
+    bool isCommandsEnabled();
     bool isDroneOut();
     bool isDroneInside();
     bool isDroneNear();
-    void turnCommandsOff();
 
     bool isTakeOffCommandReceived();
     bool isLandingCommandReceived();
     bool isPreAlarm();
     bool isAlarm();
     bool isResetButtonPressed();
-    bool isAlarmSendedToDRU();
-    bool isPreAlarmSendedToDRU();
 
     String getStatusMessageForDRU();
 

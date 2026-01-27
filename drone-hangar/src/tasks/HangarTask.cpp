@@ -20,9 +20,6 @@ void HangarTask::tick() {
             l1->switchOn();
             context->confirmDroneInside();
         }
-        if (context->isPreAlarm()) {
-            setState(PRE_ALARM);
-        }
         if (context->isTakeOffCommandReceived()) {
             setState(TAKE_OFF);
         }
@@ -56,20 +53,6 @@ void HangarTask::tick() {
 
         if(context->isDroneInside()) {
             setState(DRONE_INSIDE);
-        }
-        break;
-
-    case PRE_ALARM:
-        if (checkAndSetJustEntered()) {
-            log("Entering PRE_ALARM state");
-            l3->switchOn();
-        }
-        if (!context->isPreAlarm()) {
-            if (context->isDroneInside()) {
-                setState(DRONE_INSIDE);
-            } else {
-                setState(DRONE_OUT);
-            }
         }
         break;
 
@@ -109,9 +92,6 @@ void HangarTask::updateDisplay() {
         case LANDING:
             message = "LANDING";
             break;
-        case PRE_ALARM:
-            message = "PRE-ALARM";
-            break;
         case ALARM:
             message = "ALARM";
             break;
@@ -122,7 +102,7 @@ void HangarTask::updateDisplay() {
 bool HangarTask::checkAndSetJustEntered() {
     bool result = justEntered;
     if (justEntered) {
-        updateDisplay(); 
+        updateDisplay();
         justEntered = false;
     }
     return result;

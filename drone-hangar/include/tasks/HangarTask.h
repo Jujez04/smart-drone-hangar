@@ -21,7 +21,6 @@ private:
         TAKE_OFF,
         DRONE_OUT,
         LANDING,
-        PRE_ALARM,
         ALARM
     };
 

@@ -74,7 +74,7 @@ void Context::confirmDroneInside()
 void Context::confirmDroneOut()
 {
     droneIsInsideFlag = false;
-    droneNear = false; // Reset sensor logic on exit
+    droneNear = false;
 }
 
 void Context::clearTakingOffCommand(){
@@ -110,14 +110,13 @@ bool Context::isDroneNear()
     return droneNear;
 }
 
-void Context::turnCommandsOff()
-{
-    commandsFlag = false;
-}
-
 void Context::confirmTakeOffCommandReceived()
 {
     takeOffCommandReceived = true;
+}
+
+bool Context::isCommandsEnabled() {
+    return commandsFlag;
 }
 
 bool Context::isTakeOffCommandReceived()
@@ -174,27 +173,13 @@ bool Context::isResetButtonPressed()
     return resetButtonPressed;
 }
 
-// TODO
-void Context::confirmAlarmSendedToDRU() {}
-
-bool Context::isAlarmSendedToDRU()
-{
-    return false;
-}
-bool Context::isPreAlarmSendedToDRU()
-{
-    return false;
-}
-
 String Context::getStatusMessageForDRU()
 {
     if (alarm)
         return "ALARM";
-    if (preAlarm)
-        return "PRE_ALARM";
-    if (doorMoving && takeOffCommandReceived)
+    if (takeOffCommandReceived)
         return "TAKING_OFF";
-    if (doorMoving && landingCommandReceived)
+    if (landingCommandReceived)
         return "LANDING";
     if (!droneIsInsideFlag)
         return "DRONE_OUT";
