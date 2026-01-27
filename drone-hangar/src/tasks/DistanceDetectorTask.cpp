@@ -34,7 +34,7 @@ void DistanceDetectorTask::tick()
         if (!isValidReading(distance))
             return;
 
-        // --- TAKEOFF LOGIC ---
+        // Takeoff
         if (distance > D1)
         {
             if (timeAboveD1 == 0)
@@ -54,7 +54,7 @@ void DistanceDetectorTask::tick()
             timeAboveD1 = 0;
         }
 
-        // --- LANDING LOGIC ---
+        // Landing
         if (distance < D2)
         {
             if (timeBelowD2 == 0)

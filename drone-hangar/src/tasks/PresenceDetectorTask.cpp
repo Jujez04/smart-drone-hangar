@@ -5,11 +5,10 @@
 PresenceDetectorTask::PresenceDetectorTask(Pir *pPir, Context *pContext)
     : pPir(pPir), pContext(pContext)
 {
-    setState(IDLE);
+    setState(CALIBRATION);
 }
 
-void PresenceDetectorTask::init(int period)
-{
+void PresenceDetectorTask::init(int period) {
     PeriodicTask::init(period);
 }
 
@@ -17,6 +16,21 @@ void PresenceDetectorTask::tick()
 {
     switch (state)
     {
+    case CALIBRATION:
+    {
+        if (checkAndSetJustEntered())
+        {
+            log("CALIBRATION - Starting PIR calibration (10s)...");
+            pPir->calibrate();
+        }
+        if (elapsedTimeInState() >= PIR_CALIBRATION_TIME)
+        {
+            log("CALIBRATION - Completed.");
+            setState(IDLE);
+        }
+        break;
+    }
+
     case IDLE:
     {
         if (checkAndSetJustEntered())

@@ -17,7 +17,7 @@ bool Pir::isDetected(){
 }
 
 void Pir::calibrate(){
-	delay(10000);
+	// delay(10000); --> Moved into the PresenceDetectorTask
 }
 
 void Pir::updateSyncTime(long time){

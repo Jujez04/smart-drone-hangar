@@ -4,7 +4,6 @@
 // Kernel
 #include "kernel/Scheduler.h"
 #include "kernel/Logger.h"
-#include "kernel/MsgService.h"
 
 // Model & HW
 #include "model/HWPlatform.h"

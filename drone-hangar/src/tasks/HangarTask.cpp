@@ -18,7 +18,6 @@ void HangarTask::tick() {
             l1->switchOn();
             context->confirmDroneInside();
         }
-        // Logica di transizione
         if (context->isTakeOffCommandReceived()) {
             setState(TAKE_OFF);
         }
@@ -28,8 +27,7 @@ void HangarTask::tick() {
         if (checkAndSetJustEntered()) {
             l1->switchOff();
         }
-        
-        // Logica di transizione
+
         if(context->isDroneOut()) {
             setState(DRONE_OUT);
         }
@@ -40,8 +38,7 @@ void HangarTask::tick() {
             l1->switchOff();
             context->confirmDroneOut();
         }
-        
-        // Logica di transizione
+
         if (context->isLandingCommandReceived()) {
             setState(LANDING);
         }
@@ -51,8 +48,7 @@ void HangarTask::tick() {
         if (checkAndSetJustEntered()) {
             l1->switchOff();
         }
-        
-        // Logica di transizione
+
         if(context->isDroneInside()) {
             setState(DRONE_INSIDE);
         }
@@ -60,13 +56,13 @@ void HangarTask::tick() {
 
     case PRE_ALARM:
         if (checkAndSetJustEntered()) {
-            // Logica pre-allarme
+            //TODO
         }
         break;
 
     case ALARM:
         if (checkAndSetJustEntered()) {
-            // Logica allarme
+            //TODO
         }
         break;
     }
@@ -74,7 +70,7 @@ void HangarTask::tick() {
 
 void HangarTask::updateDisplay() {
     lcd->clear();
-    lcd->setCursor(0, 0); // Posizionati all'inizio
+    lcd->setCursor(0, 0);
 
     String message;
     switch (state) {
@@ -103,7 +99,6 @@ void HangarTask::updateDisplay() {
 bool HangarTask::checkAndSetJustEntered() {
     bool result = justEntered;
     if (justEntered) {
-        // Appena entrati in un nuovo stato, aggiorniamo il display automaticamente
         updateDisplay(); 
         justEntered = false;
     }
@@ -113,6 +108,6 @@ bool HangarTask::checkAndSetJustEntered() {
 // CORREZIONE CRUCIALE QUI SOTTO
 void HangarTask::setState(HangarState newState) {
     this->state = newState;
-    this->stateTimestamp = millis(); // Resetta il tempo
-    this->justEntered = true;        // Attiva il flag di ingresso per il prossimo tick
+    this->stateTimestamp = millis();
+    this->justEntered = true;
 }

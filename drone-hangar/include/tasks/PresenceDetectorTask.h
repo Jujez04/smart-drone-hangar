@@ -14,6 +14,7 @@ public:
 
 private:
     enum PresenceDetectorState {
+        CALIBRATION, // Calibrating PIR sensor
         IDLE,        // Not monitoring presence
         ACTIVE       // Actively reading PIR
     } state;

@@ -29,7 +29,7 @@ HWPlatform::HWPlatform() {
 void HWPlatform::init() {
   pLcd->init();
   pLcd->turnOn();
-  pPir->calibrate();
+  // pPir->calibrate();
   pMotor->on();
   pMotor->setPosition(0);
 }

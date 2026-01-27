@@ -15,21 +15,20 @@ public:
 private:
     Context* pContext;
     String inputBuffer;
-    
-    // Timer per l'invio dello stato (non vogliamo inviare ad ogni tick)
-    unsigned long lastStatusTime;
-    const unsigned long STATUS_PERIOD = 200; // Invia stato ogni 200ms
 
-    // Prefissi protocollo
-    static const String CMD_PREFIX;  // "ru:" (Input)
-    static const String APP_PREFIX;  // "dh:" (Output)
-    static const String LOG_PREFIX;  // "lo:" (Output)
+    unsigned long lastStatusTime;
+    const unsigned long STATUS_PERIOD = 200; // Send status every 200ms
+
+    // Communication protocol
+    const String CMD_PREFIX = "ru:";
+    const String APP_PREFIX = "dh:";
+    const String LOG_PREFIX = "lo:";
 
     // Metodi interni
     void readSerialData();
     void processCommand(String command);
     void sendStatusUpdate();
-    void sendLog(const String& msg);
+    void log(const String& msg);
 };
 
 #endif
