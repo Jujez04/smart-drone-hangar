@@ -5,7 +5,7 @@
 SerialCommTask::SerialCommTask(Context *pContext) : pContext(pContext)
 {
     inputBuffer = "";
-    inputBuffer.reserve(50);
+    inputBuffer.reserve(50); // Riserva memoria una volta sola
     lastStatusTime = 0;
 }
 
@@ -29,7 +29,6 @@ void SerialCommTask::readSerialData()
     while (Serial.available() > 0)
     {
         char ch = (char)Serial.read();
-
         if (ch == '\n')
         {
             if (inputBuffer.length() > 0)
@@ -54,38 +53,37 @@ void SerialCommTask::processCommand(String msg)
         if (cmd == "TAKEOFF")
         {
             pContext->confirmTakeOffCommandReceived();
-            log("CMD TAKEOFF ACCEPTED");
+
+            Serial.println(F("lo:CMD TAKEOFF ACCEPTED"));
         }
         else if (cmd == "LANDING")
         {
             pContext->confirmLandingCommandReceived();
-            log("CMD LANDING ACCEPTED");
+            Serial.println(F("lo:CMD LANDING ACCEPTED"));
         }
         else if (cmd == "RESET")
         {
             pContext->confirmResetButtonPressed();
-            log("CMD RESET ACCEPTED");
+            Serial.println(F("lo:CMD RESET ACCEPTED"));
         }
         else
         {
-            log("ERROR: Unknown command -> " + cmd);
+            Serial.print(F("lo:ERROR: Unknown command -> "));
+            Serial.println(cmd);
         }
-    }
-    else
-    {
-        // Messaggio ignorato (rumore o formato errato)
-        log("Ignored raw msg: " + msg);
     }
 }
 
 void SerialCommTask::sendStatusUpdate()
 {
-    // Standard: dh:STATUS:<VALORE>
-    String msg = APP_PREFIX + "STATUS:" + pContext->getStatusMessageForDRU();
-    Serial.println(msg);
+
+    Serial.print(F("dh:STATUS:"));
+    Serial.println(pContext->getStatusMessageForDRU());
 }
 
 void SerialCommTask::log(const String &msg)
 {
-    Serial.println(LOG_PREFIX + msg);
+    // Versione ottimizzata per messaggi dinamici
+    Serial.print(F("lo:"));
+    Serial.println(msg);
 }
