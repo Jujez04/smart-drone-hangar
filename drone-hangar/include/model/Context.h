@@ -21,13 +21,15 @@ public:
     void clearTakingOffCommand();
     void confirmLandingCommandReceived();
     void clearLandingCommand();
-
+    void disableCommands();
+    void enableCommands();
     void triggerPreAlarm();
     void triggerAlarm();
     void confirmResetButtonPressed();
     void clearResetButtonPressed();
     void confirmAlarmSendedToDRU();
     void clearPreAlarm();
+    void clearAlarm();
     bool isStopped();
     bool isDoorClosed();
     bool isDoorOpen();

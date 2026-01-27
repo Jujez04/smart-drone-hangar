@@ -91,7 +91,7 @@ void setup() {
 
 
     // E. Alarm Task
-    tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pContext);
+    tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pHWPlatform->getButton(), pContext);
     tAlarm->init(500);
     sched.addTask(tAlarm);
 

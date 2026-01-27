@@ -6,15 +6,17 @@
 #include "kernel/PeriodicTask.h"
 #include "model/Context.h"
 #include "devices/temperature/TempSensorTMP36.h"
+#include "devices/button/Button.h"
 #include "config.h"
 
 class AlarmTask : public PeriodicTask {
 public:
-    AlarmTask(TempSensor* pTempSensor, Context* pContext);
+    AlarmTask(TempSensor* pTempSensor, Button* pResetButton, Context* pContext);
     void init(int period) override;
     void tick() override;
 private:
     TempSensor* pTempSensor;
+    Button* pResetButton;
     Context* pContext;
 
     enum AlarmState {

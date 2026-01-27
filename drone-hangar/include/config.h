@@ -48,7 +48,7 @@
 
 // Alarm Factors
 #define TEMP_1 5.0
-#define TEMP_2 30.0
+#define TEMP_2 6.0
 #define T3 10000
 #define T4 3000
 

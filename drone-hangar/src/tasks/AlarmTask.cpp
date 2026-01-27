@@ -3,8 +3,8 @@
 #include "kernel/Logger.h"
 #include "config.h"
 
-AlarmTask::AlarmTask(TempSensor *pTempSensor, Context *pContext)
-    : pTempSensor(pTempSensor), pContext(pContext)
+AlarmTask::AlarmTask(TempSensor *pTempSensor, Button *pResetButton, Context *pContext)
+    : pTempSensor(pTempSensor), pResetButton(pResetButton), pContext(pContext)
 {
     setState(IDLE);
 }
@@ -25,6 +25,8 @@ void AlarmTask::tick()
             timeAboveTemp1 = 0;
             timeAboveTemp2 = 0;
             pContext->clearPreAlarm();
+            pContext->clearAlarm();
+            pContext->enableCommands();
         }
         if (currentTemp >= TEMP_1)
         {
@@ -47,15 +49,40 @@ void AlarmTask::tick()
             timeAboveTemp1 = 0;
             timeAboveTemp2 = 0;
             pContext->triggerPreAlarm();
+            pContext->disableCommands();
         }
 
         if (currentTemp < TEMP_1) {
             Serial.println(F("lo:[AlarmTask] Temp OK -> IDLE"));
             setState(IDLE);
+        } else if (currentTemp >= TEMP_2) {
+            if (timeAboveTemp2 == 0) timeAboveTemp2 = millis();
+            if (millis() - timeAboveTemp2 >= T4) {
+                setState(ALARM);
+            }
+        }
+        else {
+            timeAboveTemp2 = 0;
         }
         break;
 
     case ALARM:
+        if (checkAndSetJustEntered())
+        {
+            Serial.println(F("lo:[Alarm] CRITICAL STATE"));
+            pContext->triggerAlarm();
+            pContext->disableCommands();
+        }
+
+        if (!pContext->isAlarm()) {
+            Serial.println(F("lo:[Alarm] Manual Reset -> IDLE"));
+            setState(IDLE);
+        }
+        if (pResetButton->isPressed())
+        {
+            pContext->clearAlarm();
+            setState(IDLE);
+        }
         break;
     }
 }

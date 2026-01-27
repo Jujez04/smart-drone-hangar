@@ -11,6 +11,7 @@ Context::Context()
     preAlarm = false;
     alarm = false;
     resetButtonPressed = false;
+    commandsFlag = true;
 }
 
 void Context::closeDoor()
@@ -20,6 +21,18 @@ void Context::closeDoor()
 
 void Context::clearPreAlarm() {
     preAlarm = false;
+}
+
+void Context::clearAlarm() {
+    alarm = false;
+}
+
+void Context::disableCommands() {
+    commandsFlag = false;
+}
+
+void Context::enableCommands() {
+    commandsFlag = true;
 }
 
 void Context::openDoor()

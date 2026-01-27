@@ -11,6 +11,9 @@ HangarTask::HangarTask(LcdI2C* lcd, Led* l1, Led* l3, Button* resetButton, Conte
 }
 
 void HangarTask::tick() {
+    if (context->isAlarm() && state != ALARM) {
+        setState(ALARM);
+    }
     switch (state) {
     case DRONE_INSIDE:
         if (checkAndSetJustEntered()) {
@@ -72,7 +75,17 @@ void HangarTask::tick() {
 
     case ALARM:
         if (checkAndSetJustEntered()) {
-            //TODO
+            l1->switchOff();
+            l3->switchOn();
+        }
+
+        if (!context->isAlarm()) {
+            l3->switchOff();
+            if (context->isDroneInside()) {
+                setState(DRONE_INSIDE);
+            } else {
+                setState(DRONE_OUT);
+            }
         }
         break;
     }
