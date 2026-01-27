@@ -1,11 +1,9 @@
 #include "tasks/BlinkingTask.h"
-#include <Arduino.h>
-#include "config.h"
 #include "kernel/Logger.h"
-#include "tasks/BlinkingTask.h"
+#include "config.h"
 
-BlinkingTask::BlinkingTask(Led* pLed, Context* pContext):
-    pContext(pContext), pLed(pLed){
+BlinkingTask::BlinkingTask(Led* pLed, Context* pContext)
+    : pLed(pLed), pContext(pContext) {
     setState(IDLE);
 }
 
@@ -14,47 +12,63 @@ void BlinkingTask::init(int period) {
 }
 
 void BlinkingTask::tick() {
+
+    bool systemBusy = pContext->isTakeOffCommandReceived() || pContext->isLandingCommandReceived();
     switch (state) {
-        case IDLE:
-            if (checkAndSetJustEntered()) pLed->switchOff();
-            if (pContext->isTakeOffCommandReceived()) setState(ON);
+        case IDLE: {
+            if (checkAndSetJustEntered()) {
+                pLed->switchOff();
+            }
+            if (systemBusy) {
+                setState(ON);
+            }
             break;
+        }
 
-        case OFF:
-            if (checkAndSetJustEntered()) pLed->switchOff();
-            // CORREZIONE: Passa a ON dopo il tempo stabilito
-            if (elapsedTimeInState() >= BLINK_PERIOD) setState(ON);
-            
-            // Uscita
-            if (pContext->isDroneOut() || (pContext->isDroneInside() && !pContext->isTakeOffCommandReceived())) 
+        case ON: {
+            if (checkAndSetJustEntered()) {
+                pLed->switchOn();
+            }
+
+            if (elapsedTimeInState() >= BLINK_PERIOD) {
+                setState(OFF);
+            }
+            if (!systemBusy) {
                 setState(IDLE);
+            }
             break;
+        }
 
-        case ON:
-            if (checkAndSetJustEntered()) pLed->switchOn();
-            // CORREZIONE: Passa a OFF dopo il tempo stabilito (questo mancava!)
-            if (elapsedTimeInState() >= BLINK_PERIOD) setState(OFF);
-            
-            // Uscita immediata se il drone è fuori
-            if (pContext->isDroneOut()) setState(IDLE);
+        case OFF: {
+            if (checkAndSetJustEntered()) {
+                pLed->switchOff();
+            }
+
+            if (elapsedTimeInState() >= BLINK_PERIOD) {
+                setState(ON);
+            }
+            if (!systemBusy) {
+                setState(IDLE);
+            }
             break;
+        }
     }
 }
 
-void BlinkingTask::setState(BlinkingState s){
+void BlinkingTask::setState(BlinkingState s) {
     state = s;
     stateTimestamp = millis();
     justEntered = true;
 }
 
-long BlinkingTask::elapsedTimeInState(){
+long BlinkingTask::elapsedTimeInState() {
     return millis() - stateTimestamp;
 }
 
-bool BlinkingTask::checkAndSetJustEntered(){
-    bool bak = justEntered;
-    if (justEntered){
-      justEntered = false;
+bool BlinkingTask::checkAndSetJustEntered() {
+    bool result = justEntered;
+    if (justEntered) {
+        justEntered = false;
     }
-    return bak;
+    return result;
 }
