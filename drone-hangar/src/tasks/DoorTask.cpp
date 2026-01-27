@@ -2,6 +2,8 @@
 #include "kernel/Logger.h"
 #include "config.h"
 
+#define SERVO_STEP_DELAY 10 // milliseconds per degree step
+
 DoorTask::DoorTask(ServoMotor *pServo, Context *pContext)
     : pServo(pServo), pContext(pContext)
 {
@@ -21,11 +23,14 @@ void DoorTask::tick()
         {
             log("CLOSED");
             pServo->setPosition(DOOR_CLOSED_ANGLE);
+            currentPosition = DOOR_CLOSED_ANGLE;
             pContext->confirmDoorClosed();
         }
-        // Open on Takeoff OR (Landing AND PIR detected)
-        if (pContext->isTakeOffCommandReceived() ||
-            (pContext->isLandingCommandReceived() && pContext->isDroneNear()))
+
+        bool validTakeoff = pContext->isTakeOffCommandReceived() && pContext->isDroneInside();
+        bool validLanding = pContext->isLandingCommandReceived() && pContext->isDroneNear();
+
+        if (validTakeoff || validLanding)
         {
             setState(OPENING);
         }
@@ -36,12 +41,21 @@ void DoorTask::tick()
     {
         if (checkAndSetJustEntered())
         {
-            log("OPENING");
-            pServo->setPosition(DOOR_OPEN_ANGLE);
+            log("OPENING...");
             pContext->openDoor();
         }
-        if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME)
-            setState(OPEN);
+
+        static long lastStepTime = 0;
+        if (millis() - lastStepTime >= SERVO_STEP_DELAY) {
+            lastStepTime = millis();
+            
+            if (currentPosition < DOOR_OPEN_ANGLE) {
+                currentPosition++;
+                pServo->setPosition(currentPosition);
+            } else {
+                setState(OPEN);
+            }
+        }
         break;
     }
 
@@ -52,15 +66,15 @@ void DoorTask::tick()
             log("OPEN");
             pContext->confirmDoorOpened();
         }
-        // Close logic:
-        // 1. Drone is OUT and NOT landing (Takeoff done)
-        if (pContext->isDroneOut() && !pContext->isLandingCommandReceived())
+
+        if (pContext->isDroneOut() && pContext->isTakeOffCommandReceived())
         {
+            pContext->clearTakingOffCommand();
             setState(CLOSING);
         }
-        // 2. Drone is INSIDE (Landing done)
-        else if (pContext->isDroneInside())
+        else if (pContext->isDroneInside() && pContext->isLandingCommandReceived())
         {
+            pContext->clearLandingCommand();
             setState(CLOSING);
         }
         break;
@@ -70,12 +84,20 @@ void DoorTask::tick()
     {
         if (checkAndSetJustEntered())
         {
-            log("CLOSING");
-            pServo->setPosition(DOOR_CLOSED_ANGLE);
+            log("CLOSING...");
             pContext->closeDoor();
         }
-        if (elapsedTimeInState() >= DOOR_MOVEMENT_TIME)
-            setState(CLOSED);
+
+        static long lastStepTime = 0;
+        if (millis() - lastStepTime >= SERVO_STEP_DELAY) {
+            lastStepTime = millis();
+            if (currentPosition > DOOR_CLOSED_ANGLE) {
+                currentPosition--;
+                pServo->setPosition(currentPosition);
+            } else {
+                setState(CLOSED);
+            }
+        }
         break;
     }
     }

@@ -65,7 +65,6 @@ void PresenceDetectorTask::tick()
         }
         else
         {
-            log("NO PRESENCE.");
             pContext->confirmDroneFar();
         }
         break;

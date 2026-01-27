@@ -38,10 +38,12 @@ bool Context::isDoorClosed()
 {
     return !doorOpen && !doorMoving;
 }
+
 bool Context::isDoorOpen()
 {
     return doorOpen && !doorMoving;
 }
+
 bool Context::isStopped()
 {
     return !doorMoving;
@@ -50,14 +52,20 @@ bool Context::isStopped()
 void Context::confirmDroneInside()
 {
     droneIsInsideFlag = true;
-    landingCommandReceived = false;
 }
 
 void Context::confirmDroneOut()
 {
     droneIsInsideFlag = false;
-    takeOffCommandReceived = false;
     droneNear = false; // Reset sensor logic on exit
+}
+
+void Context::clearTakingOffCommand(){
+    takeOffCommandReceived = false;
+}
+
+void Context::clearLandingCommand(){
+    landingCommandReceived = false;
 }
 
 bool Context::isDroneInside()
@@ -100,6 +108,7 @@ void Context::confirmLandingCommandReceived()
     landingCommandReceived = true;
     droneNear = false;
 }
+
 bool Context::isLandingCommandReceived()
 {
     return landingCommandReceived;

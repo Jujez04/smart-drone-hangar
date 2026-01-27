@@ -18,7 +18,9 @@ public:
     void confirmDroneFar();
 
     void confirmTakeOffCommandReceived();
+    void clearTakingOffCommand();
     void confirmLandingCommandReceived();
+    void clearLandingCommand();
 
     void triggerPreAlarm();
     void triggerAlarm();
