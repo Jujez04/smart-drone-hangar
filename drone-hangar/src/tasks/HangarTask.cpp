@@ -1,10 +1,9 @@
 #include "tasks/HangarTask.h"
 #include <Arduino.h> // Necessario per millis()
 
-HangarTask::HangarTask(LcdI2C* lcd, Led* l1, Button* resetButton, Context * context)
-    :lcd(lcd), l1(l1), resetButton(resetButton), context(context) {
+HangarTask::HangarTask(LcdI2C* lcd, Led* l1, Led* l3, Button* resetButton, Context * context)
+    :lcd(lcd), l1(l1), l3(l3), resetButton(resetButton), context(context) {
     lcd->turnOn();
-    // Inizializzazione variabili FSM
     setState(DRONE_INSIDE);
     takeoffConfirmationTimer = 0;
     landingConfirmationTimer = 0;

@@ -17,6 +17,7 @@
 #include "tasks/HangarTask.h"
 #include "tasks/SerialCommTask.h"
 #include "tasks/TestHWTask.h"
+#include "tasks/AlarmTask.h"
 
 Scheduler sched;
 HWPlatform *pHWPlatform;
@@ -29,6 +30,7 @@ DoorTask *tDoor;
 DistanceDetectorTask *tDistance;
 PresenceDetectorTask *tPresence;
 BlinkingTask *tBlink;
+AlarmTask* tAlarm;
 
 // #define __TESTING_HW__
 
@@ -59,6 +61,7 @@ void setup() {
     tHangar = new HangarTask(
         pHWPlatform->getLcd(),
         pHWPlatform->getL1(),
+        pHWPlatform->getL3(),
         pHWPlatform->getButton(),
         pContext);
     tHangar->init(100);
@@ -87,12 +90,10 @@ void setup() {
     sched.addTask(tDistance);
 
 
-    // E. Alarm Task //TODO
-    /*
-    AlarmTask* tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pHWPlatform->getL3(), pContext);
+    // E. Alarm Task
+    tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pContext);
     tAlarm->init(500);
     sched.addTask(tAlarm);
-    */
 
 #endif
 

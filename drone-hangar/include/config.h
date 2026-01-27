@@ -47,9 +47,9 @@
 #define T2 2000 // ms
 
 // Alarm Factors
-#define TEMP_1 25.0
+#define TEMP_1 5.0
 #define TEMP_2 30.0
-#define T3 3000
+#define T3 10000
 #define T4 3000
 
 #define BLINK_PERIOD 500

@@ -12,7 +12,7 @@
 class HangarTask: public PeriodicTask {
 
 public:
-    HangarTask(LcdI2C* lcd, Led* l1, Button* resetButton, Context* context);
+    HangarTask(LcdI2C* lcd, Led* l1, Led* l3, Button* resetButton, Context* context);
     void tick();
 
 private:
@@ -37,6 +37,7 @@ private:
     unsigned long takeoffConfirmationTimer;
     unsigned long landingConfirmationTimer;
     Led* l1;
+    Led* l3;
     Button* resetButton;
     Context* context;
     LcdI2C* lcd;

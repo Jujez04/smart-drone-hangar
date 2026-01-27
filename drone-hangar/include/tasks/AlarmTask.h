@@ -10,11 +10,11 @@
 
 class AlarmTask : public PeriodicTask {
 public:
-    AlarmTask(TempSensorTMP36* pTempSensor, Context* pContext);
+    AlarmTask(TempSensor* pTempSensor, Context* pContext);
     void init(int period) override;
     void tick() override;
 private:
-    TempSensorTMP36* pTempSensor;
+    TempSensor* pTempSensor;
     Context* pContext;
 
     enum AlarmState {

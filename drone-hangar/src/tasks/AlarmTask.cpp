@@ -3,7 +3,7 @@
 #include "kernel/Logger.h"
 #include "config.h"
 
-AlarmTask::AlarmTask(TempSensorTMP36 *pTempSensor, Context *pContext)
+AlarmTask::AlarmTask(TempSensor *pTempSensor, Context *pContext)
     : pTempSensor(pTempSensor), pContext(pContext)
 {
     setState(IDLE);
