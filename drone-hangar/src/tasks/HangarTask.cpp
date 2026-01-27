@@ -1,5 +1,5 @@
 #include "tasks/HangarTask.h"
-#include <Arduino.h> // Necessario per millis()
+#include "kernel/Logger.h"
 
 HangarTask::HangarTask(LcdI2C* lcd, Led* l1, Led* l3, Button* resetButton, Context * context)
     :lcd(lcd), l1(l1), l3(l3), resetButton(resetButton), context(context) {
@@ -16,6 +16,9 @@ void HangarTask::tick() {
         if (checkAndSetJustEntered()) {
             l1->switchOn();
             context->confirmDroneInside();
+        }
+        if (context->isPreAlarm()) {
+            setState(PRE_ALARM);
         }
         if (context->isTakeOffCommandReceived()) {
             setState(TAKE_OFF);
@@ -55,7 +58,15 @@ void HangarTask::tick() {
 
     case PRE_ALARM:
         if (checkAndSetJustEntered()) {
-            //TODO
+            log("Entering PRE_ALARM state");
+            l3->switchOn();
+        }
+        if (!context->isPreAlarm()) {
+            if (context->isDroneInside()) {
+                setState(DRONE_INSIDE);
+            } else {
+                setState(DRONE_OUT);
+            }
         }
         break;
 
@@ -104,8 +115,18 @@ bool HangarTask::checkAndSetJustEntered() {
     return result;
 }
 
+void HangarTask::log(const String text)
+{
+    Logger.log("[HangarTask] " + text);
+}
+
 void HangarTask::setState(HangarState newState) {
     this->state = newState;
     this->stateTimestamp = millis();
     this->justEntered = true;
+}
+
+long HangarTask::elapsedTimeInState()
+{
+    return millis() - stateTimestamp;
 }

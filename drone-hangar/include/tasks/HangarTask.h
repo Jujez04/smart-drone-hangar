@@ -6,7 +6,7 @@
 #include "devices/button/Button.h"
 #include "devices/led/Led.h"
 #include "devices/lcd/LcdI2C.h"
-
+#include <Arduino.h>
 
 
 class HangarTask: public PeriodicTask {
@@ -28,7 +28,7 @@ private:
     void setState(HangarState state);
     long elapsedTimeInState();
     bool checkAndSetJustEntered();
-    void log(const char& text);
+    void log(const String text);
     void updateDisplay();
 
     HangarState state;

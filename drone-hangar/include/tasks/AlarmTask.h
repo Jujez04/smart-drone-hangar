@@ -23,8 +23,8 @@ private:
         ALARM
     } state;
 
-    unsigned long timeAboveT1;
-    unsigned long timeAboveT2;
+    unsigned long timeAboveTemp1;
+    unsigned long timeAboveTemp2;
     unsigned long stateTimestamp;
     bool justEntered;
 

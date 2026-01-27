@@ -18,6 +18,10 @@ void Context::closeDoor()
     doorMoving = true;
 }
 
+void Context::clearPreAlarm() {
+    preAlarm = false;
+}
+
 void Context::openDoor()
 {
     doorMoving = true;
@@ -91,6 +95,11 @@ void Context::confirmDroneFar()
 bool Context::isDroneNear()
 {
     return droneNear;
+}
+
+void Context::turnCommandsOff()
+{
+    commandsFlag = false;
 }
 
 void Context::confirmTakeOffCommandReceived()

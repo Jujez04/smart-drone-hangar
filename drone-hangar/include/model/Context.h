@@ -27,7 +27,7 @@ public:
     void confirmResetButtonPressed();
     void clearResetButtonPressed();
     void confirmAlarmSendedToDRU();
-
+    void clearPreAlarm();
     bool isStopped();
     bool isDoorClosed();
     bool isDoorOpen();
@@ -35,6 +35,7 @@ public:
     bool isDroneOut();
     bool isDroneInside();
     bool isDroneNear();
+    void turnCommandsOff();
 
     bool isTakeOffCommandReceived();
     bool isLandingCommandReceived();
@@ -47,6 +48,7 @@ public:
     String getStatusMessageForDRU();
 
 private:
+    bool commandsFlag;
     bool doorOpen;
     bool doorMoving;
     bool droneNear;
