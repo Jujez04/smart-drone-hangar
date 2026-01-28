@@ -64,7 +64,7 @@ void SerialCommTask::processCommand(String msg)
 void SerialCommTask::sendStatusUpdate()
 {
     if (Serial.availableForWrite() < 32) {
-        return; 
+        return;
     }
     Serial.print(F("dh:STATUS:"));
     Serial.println(pContext->getStatusMessageForDRU());

@@ -36,7 +36,7 @@ AlarmTask* tAlarm;
 
 void setup() {
     // 1. Init System
-    Serial.begin(SERIAL_BAUD_RATE);
+    Logger.init();
     delay(100); // Attendi un attimo per stabilizzare la serialeZ
     Logger.log("::::: Drone Hangar System Booting :::::");
 
@@ -54,7 +54,7 @@ void setup() {
 
     // A. Serial Comm (Aperiodic - runs every cycle)
     tSerial = new SerialCommTask(pContext);
-    tSerial->init(50);
+    tSerial->init(SCHEDULER_BASE_PERIOD);
     sched.addTask(tSerial);
 
     // B. Logic Orchestrator (100ms)
@@ -64,35 +64,35 @@ void setup() {
         pHWPlatform->getL3(),
         pHWPlatform->getButton(),
         pContext);
-    tHangar->init(100);
+    tHangar->init(HANGAR_TASK_PERIOD);
     sched.addTask(tHangar);
 
     // Presence Detector (PIR - 1000ms)
     tPresence = new PresenceDetectorTask(pHWPlatform->getPir(), pContext);
-    tPresence->init(1000);
+    tPresence->init(DPD_TASK_PERIOD);
     sched.addTask(tPresence);
 
     // C. Actuators
     // Door Task (100ms movement update)
     tDoor = new DoorTask(pHWPlatform->getMotor(), pContext);
-    tDoor->init(100);
+    tDoor->init(DOOR_TASK_PERIOD);
     sched.addTask(tDoor);
 
-    // Blinking Task (Standard blink logic)
+    // Blinking Task
     tBlink = new BlinkingTask(pHWPlatform->getL2(), pContext);
-    tBlink->init(100); // Check period (frequency managed inside)
+    tBlink->init(SENSORS_TASK_PERIOD);
     sched.addTask(tBlink);
 
     // D. Sensors
     // Distance Detector (Sonar - 200ms to allow echo)
     tDistance = new DistanceDetectorTask(pHWPlatform->getSonar(), pContext);
-    tDistance->init(200);
+    tDistance->init(SENSORS_TASK_PERIOD);
     sched.addTask(tDistance);
 
 
     // E. Alarm Task
     tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pHWPlatform->getButton(), pContext);
-    tAlarm->init(100);
+    tAlarm->init(ALARM_TASK_PERIOD);
     sched.addTask(tAlarm);
 
 #endif

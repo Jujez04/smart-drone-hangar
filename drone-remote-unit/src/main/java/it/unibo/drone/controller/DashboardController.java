@@ -8,8 +8,8 @@ public class DashboardController {
 
     private SerialCommChannel channel;
     private LogView logger;
-    
-    // DEFINIZIONE PROTOCOLLO LATO JAVA
+
+    // Prefix for commands sent from Remote Unit to Hangar
     private static final String CMD_PREFIX = "ru:";
 
     public DashboardController(String port, DashboardView view, LogView logger) throws Exception {
@@ -34,29 +34,21 @@ public class DashboardController {
     }
 
     public void sendTakeoffCommand() {
-        // Aggiungo il prefisso ru:
         String cmd = CMD_PREFIX + "TAKEOFF";
         channel.sendMsg(cmd);
         logger.log("Sent: " + cmd);
     }
 
     public void sendLandingCommand() {
-        // Aggiungo il prefisso ru:
         String cmd = CMD_PREFIX + "LANDING";
         channel.sendMsg(cmd);
         logger.log("Sent: " + cmd);
     }
 
     public void requestStatus() {
-        // Opzionale: se volessi chiedere lo stato manualmente
-        // channel.sendMsg(CMD_PREFIX + "STATUS");
-    }
-
-    public void sendEmergencyReset() {
-        // Aggiungo il prefisso ru:
-        String cmd = CMD_PREFIX + "RESET";
-        channel.sendMsg(cmd);
-        logger.log("Sent: " + cmd);
+        //String cmd = CMD_PREFIX + "STATUS";
+        //channel.sendMsg(cmd);
+        //logger.log("Sent: " + cmd);
     }
 
     public void close() {

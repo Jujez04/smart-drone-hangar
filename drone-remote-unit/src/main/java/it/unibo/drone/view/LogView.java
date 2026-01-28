@@ -22,8 +22,6 @@ public class LogView extends JFrame {
 
         // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Log text area with scroll
         logArea = new JTextArea(25, 60);
         logArea.setEditable(false);
         logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -57,9 +55,6 @@ public class LogView extends JFrame {
             String timestamp = dateFormat.format(new Date());
             String logEntry = "[" + timestamp + "] " + message + "\n";
             logArea.append(logEntry);
-
-            // Auto-scroll to bottom
-            logArea.setCaretPosition(logArea.getDocument().getLength());
         });
     }
 

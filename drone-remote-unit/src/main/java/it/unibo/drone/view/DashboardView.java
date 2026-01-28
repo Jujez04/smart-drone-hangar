@@ -14,12 +14,12 @@ import java.awt.event.ActionListener;
 public class DashboardView extends JFrame implements ActionListener {
 
     private DashboardController controller;
-    
+
     // UI Elements
     private JTextField droneStateField;
     private JTextField hangarStateField;
     private JTextField distanceField;
-    
+
     private JButton takeoffButton;
     private JButton landingButton;
 
@@ -69,9 +69,9 @@ public class DashboardView extends JFrame implements ActionListener {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         buttonPanel.setOpaque(false);
 
-        takeoffButton = createStyledButton("TAKEOFF", new Color(70, 130, 180)); // Steel Blue
+        takeoffButton = createStyledButton("TAKEOFF", new Color(70, 130, 180));
         takeoffButton.setForeground(Color.black);
-        landingButton = createStyledButton("LANDING", new Color(255, 140, 0));  // Dark Orange
+        landingButton = createStyledButton("LANDING", new Color(255, 140, 0));
         landingButton.setForeground(Color.black);
         buttonPanel.add(takeoffButton);
         buttonPanel.add(landingButton);
@@ -81,8 +81,6 @@ public class DashboardView extends JFrame implements ActionListener {
         setContentPane(mainPanel);
         setLocationRelativeTo(null);
     }
-
-    // --- Helper Methods for UI Styling ---
 
     private JLabel createLabel(String text) {
         JLabel l = new JLabel(text);
@@ -124,13 +122,13 @@ public class DashboardView extends JFrame implements ActionListener {
      */
     public void updateViewFromStatus(String rawStatus) {
         SwingUtilities.invokeLater(() -> {
-            // 1. Map Hangar State (Normal vs Alarm)
+            // 1. Map Hangar State (Normal / Alarm)
             if (rawStatus.equals("ALARM")) {
                 hangarStateField.setText("ALARM");
                 hangarStateField.setBackground(Color.RED);
                 hangarStateField.setForeground(Color.WHITE);
             } else {
-                // Includes INSIDE, TAKE_OFF, PRE_ALARM, etc.
+                // Includes INSIDE, TAKE_OFF, DRONE_OUT, LANDING
                 hangarStateField.setText("NORMAL");
                 hangarStateField.setBackground(new Color(144, 238, 144)); // Green
                 hangarStateField.setForeground(Color.BLACK);
