@@ -42,8 +42,9 @@ public:
     bool isPreAlarm();
     bool isAlarm();
     bool isResetButtonPressed();
-
-    String getStatusMessageForDRU();
+    void setDistance(float d);
+    float getDistance();
+    const char* getStatusMessageForDRU();
 
 private:
     bool commandsFlag;
@@ -55,7 +56,7 @@ private:
 
     bool takeOffCommandReceived;
     bool landingCommandReceived;
-
+    float currentDistance;
     bool preAlarm;
     bool alarm;
     bool resetButtonPressed;

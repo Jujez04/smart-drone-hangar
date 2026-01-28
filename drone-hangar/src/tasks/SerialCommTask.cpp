@@ -5,7 +5,7 @@
 SerialCommTask::SerialCommTask(Context *pContext) : pContext(pContext)
 {
     inputBuffer = "";
-    inputBuffer.reserve(50); // Riserva memoria una volta sola
+    inputBuffer.reserve(50);
     lastStatusTime = 0;
 }
 
@@ -29,16 +29,12 @@ void SerialCommTask::readSerialData()
     while (Serial.available() > 0)
     {
         char ch = (char)Serial.read();
-        if (ch == '\n')
-        {
-            if (inputBuffer.length() > 0)
-            {
+        if (ch == '\n') {
+            if (inputBuffer.length() > 0) {
                 processCommand(inputBuffer);
                 inputBuffer = "";
             }
-        }
-        else if (ch != '\r')
-        {
+        } else if (ch != '\r') {
             inputBuffer += ch;
         }
     }
@@ -47,28 +43,19 @@ void SerialCommTask::readSerialData()
 void SerialCommTask::processCommand(String msg)
 {
     msg.trim();
-    if (msg.startsWith(CMD_PREFIX))
-    {
+    if (msg.startsWith(CMD_PREFIX)) {
         String cmd = msg.substring(CMD_PREFIX.length());
-        if (cmd == "TAKEOFF")
-        {
+        if (cmd == "TAKEOFF") {
             pContext->confirmTakeOffCommandReceived();
-
-            Serial.println(F("lo:CMD TAKEOFF ACCEPTED"));
-        }
-        else if (cmd == "LANDING")
-        {
+            Serial.println(F("lo:CMD TAKEOFF"));
+        } else if (cmd == "LANDING") {
             pContext->confirmLandingCommandReceived();
-            Serial.println(F("lo:CMD LANDING ACCEPTED"));
-        }
-        else if (cmd == "RESET")
-        {
+            Serial.println(F("lo:CMD LANDING"));
+        } else if (cmd == "RESET") {
             pContext->confirmResetButtonPressed();
-            Serial.println(F("lo:CMD RESET ACCEPTED"));
-        }
-        else
-        {
-            Serial.print(F("lo:ERROR: Unknown command -> "));
+            Serial.println(F("lo:CMD RESET"));
+        } else {
+            Serial.print(F("lo:ERR CMD:"));
             Serial.println(cmd);
         }
     }
@@ -76,14 +63,17 @@ void SerialCommTask::processCommand(String msg)
 
 void SerialCommTask::sendStatusUpdate()
 {
-
+    if (Serial.availableForWrite() < 32) {
+        return; 
+    }
     Serial.print(F("dh:STATUS:"));
     Serial.println(pContext->getStatusMessageForDRU());
+    Serial.print(F("dh:DIST:"));
+    Serial.println(pContext->getDistance());
 }
 
 void SerialCommTask::log(const String &msg)
 {
-    // Versione ottimizzata per messaggi dinamici
     Serial.print(F("lo:"));
     Serial.println(msg);
 }

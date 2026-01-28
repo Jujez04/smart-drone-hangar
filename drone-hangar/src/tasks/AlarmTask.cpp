@@ -69,18 +69,15 @@ void AlarmTask::tick()
     case ALARM:
         if (checkAndSetJustEntered())
         {
-            Serial.println(F("lo:[Alarm] CRITICAL STATE"));
+            Serial.println(F("lo:[AlarmTask] CRITICAL STATE"));
             pContext->triggerAlarm();
             pContext->disableCommands();
         }
 
-        if (!pContext->isAlarm()) {
-            Serial.println(F("lo:[Alarm] Manual Reset -> IDLE"));
-            setState(IDLE);
-        }
         if (pResetButton->isPressed())
         {
-            pContext->clearAlarm();
+            Serial.println(F("lo:BUTTON PRESSED DETECTED!"));
+            pContext->confirmResetButtonPressed();
             setState(IDLE);
         }
         break;

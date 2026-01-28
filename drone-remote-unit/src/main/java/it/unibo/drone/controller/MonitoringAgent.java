@@ -57,21 +57,11 @@ public class MonitoringAgent extends Thread {
     private void handleAppMessage(String msg) {
         if (msg.startsWith("STATUS:")) {
             String status = msg.substring("STATUS:".length());
-            view.setHangarStatus(status);
-            updateDroneStatus(status);
+            view.updateViewFromStatus(status);
 
         } else if (msg.startsWith("ALARM")) {
-            view.setHangarStatus("ALARM");
-            view.setDroneStatus("EMERGENCY");
-            logger.log("CRITICAL ALARM RECEIVED FROM HANGAR!");
-
-        } else if (msg.startsWith("TEMP:")) {
-            try {
-                double temp = Double.parseDouble(msg.substring("TEMP:".length()));
-                view.setTemperature(temp);
-            } catch (NumberFormatException ex) {
-                logger.log("Invalid temperature data: " + msg);
-            }
+            view.updateViewFromStatus("ALARM");
+            logger.log("CRITICAL: ALARM SIGNAL RECEIVED");
 
         } else if (msg.startsWith("DIST:")) {
             try {
@@ -80,23 +70,10 @@ public class MonitoringAgent extends Thread {
             } catch (NumberFormatException ex) {
                 logger.log("Invalid distance data: " + msg);
             }
-
-        } else {
+        }
+        else {
             logger.log("[APP] " + msg);
         }
     }
 
-    private void updateDroneStatus(String hangarStatus) {
-        if (hangarStatus.contains("INSIDE")) {
-            view.setDroneStatus("AT REST");
-        } else if (hangarStatus.contains("TAKING_OFF")) {
-            view.setDroneStatus("TAKING OFF");
-        } else if (hangarStatus.contains("OUT")) {
-            view.setDroneStatus("OPERATING");
-        } else if (hangarStatus.contains("LANDING")) {
-            view.setDroneStatus("LANDING");
-        } else if (hangarStatus.contains("PRE_ALARM")) {
-            view.setDroneStatus("STANDBY");
-        }
-    }
 }

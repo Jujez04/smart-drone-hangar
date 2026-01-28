@@ -3,8 +3,7 @@
 
 ButtonImpl::ButtonImpl(int pin){
   this->pin = pin;
-  pinMode(pin, INPUT);
-  
+  pinMode(pin, INPUT_PULLUP);
   lastDebounceTime = 0;
   lastButtonState = HIGH;
   buttonState = HIGH;
@@ -23,5 +22,5 @@ bool ButtonImpl::isPressed(){
   }
 
   lastButtonState = reading;
-  return buttonState == HIGH;
+  return buttonState == LOW;
 }

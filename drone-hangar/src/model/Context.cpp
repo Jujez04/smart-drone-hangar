@@ -12,6 +12,7 @@ Context::Context()
     alarm = false;
     resetButtonPressed = false;
     commandsFlag = true;
+    currentDistance = 0.0f;
 }
 
 void Context::closeDoor()
@@ -85,6 +86,14 @@ void Context::clearLandingCommand(){
     landingCommandReceived = false;
 }
 
+void Context::setDistance(float d) {
+    currentDistance = d;
+}
+
+float Context::getDistance() {
+    return currentDistance;
+}
+
 bool Context::isDroneInside()
 {
     return droneIsInsideFlag;
@@ -112,7 +121,19 @@ bool Context::isDroneNear()
 
 void Context::confirmTakeOffCommandReceived()
 {
-    takeOffCommandReceived = true;
+    // Accetta solo se i comandi sono abilitati e non siamo in allarme
+    if (commandsFlag && !(alarm || preAlarm)) {
+        takeOffCommandReceived = true;
+    }
+}
+
+void Context::confirmLandingCommandReceived()
+{
+    // Accetta solo se i comandi sono abilitati e non siamo in allarme
+    if (commandsFlag && !(alarm || preAlarm)) {
+        landingCommandReceived = true;
+        droneNear = false; // (Opzionale: questo lo avevi, puoi lasciarlo se serve alla logica)
+    }
 }
 
 bool Context::isCommandsEnabled() {
@@ -122,12 +143,6 @@ bool Context::isCommandsEnabled() {
 bool Context::isTakeOffCommandReceived()
 {
     return takeOffCommandReceived;
-}
-
-void Context::confirmLandingCommandReceived()
-{
-    landingCommandReceived = true;
-    droneNear = false;
 }
 
 bool Context::isLandingCommandReceived()
@@ -161,6 +176,10 @@ void Context::confirmResetButtonPressed()
     resetButtonPressed = true;
     alarm = false;
     preAlarm = false;
+    takeOffCommandReceived = false;
+    landingCommandReceived = false;
+    doorMoving = false;
+    enableCommands();
 }
 
 void Context::clearResetButtonPressed()
@@ -173,7 +192,7 @@ bool Context::isResetButtonPressed()
     return resetButtonPressed;
 }
 
-String Context::getStatusMessageForDRU()
+const char* Context::getStatusMessageForDRU()
 {
     if (alarm)
         return "ALARM";

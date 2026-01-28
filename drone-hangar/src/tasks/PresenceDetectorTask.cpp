@@ -14,6 +14,10 @@ void PresenceDetectorTask::init(int period) {
 
 void PresenceDetectorTask::tick()
 {
+    if (pContext->isAlarm()) {
+        if (state != IDLE) setState(IDLE);
+        return;
+    }
     switch (state)
     {
     case CALIBRATION:

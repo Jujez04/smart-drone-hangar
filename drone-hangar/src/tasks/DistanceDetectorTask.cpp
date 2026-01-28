@@ -34,6 +34,7 @@ void DistanceDetectorTask::tick()
         if (!isValidReading(distance))
             return;
 
+        pContext->setDistance(distance);
         // Takeoff
         if (distance > D1)
         {

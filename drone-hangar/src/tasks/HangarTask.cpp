@@ -20,7 +20,7 @@ void HangarTask::tick() {
             l1->switchOn();
             context->confirmDroneInside();
         }
-        if (context->isTakeOffCommandReceived()) {
+        if (context->isTakeOffCommandReceived() && !context->isPreAlarm()) {
             setState(TAKE_OFF);
         }
         break;
@@ -41,14 +41,13 @@ void HangarTask::tick() {
             context->confirmDroneOut();
         }
 
-        if (context->isLandingCommandReceived()) {
+        if (context->isLandingCommandReceived() && !context->isPreAlarm()) {
             setState(LANDING);
         }
         break;
 
     case LANDING:
         if (checkAndSetJustEntered()) {
-            l1->switchOff();
         }
 
         if(context->isDroneInside()) {
@@ -58,7 +57,6 @@ void HangarTask::tick() {
 
     case ALARM:
         if (checkAndSetJustEntered()) {
-            l1->switchOff();
             l3->switchOn();
         }
 

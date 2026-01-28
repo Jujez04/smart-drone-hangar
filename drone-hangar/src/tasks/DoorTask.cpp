@@ -71,7 +71,7 @@ void DoorTask::tick()
             pContext->clearTakingOffCommand();
             setState(CLOSING);
         }
-        if (pContext->isAlarm()) {
+        if (pContext->isAlarm() || pContext->isPreAlarm()) {
             setState(CLOSING);
         }
         else if (pContext->isDroneInside() && pContext->isLandingCommandReceived())

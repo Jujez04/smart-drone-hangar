@@ -67,9 +67,9 @@ void setup() {
     tHangar->init(100);
     sched.addTask(tHangar);
 
-    // Presence Detector (PIR - 200ms)
+    // Presence Detector (PIR - 1000ms)
     tPresence = new PresenceDetectorTask(pHWPlatform->getPir(), pContext);
-    tPresence->init(200);
+    tPresence->init(1000);
     sched.addTask(tPresence);
 
     // C. Actuators
@@ -92,7 +92,7 @@ void setup() {
 
     // E. Alarm Task
     tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pHWPlatform->getButton(), pContext);
-    tAlarm->init(500);
+    tAlarm->init(100);
     sched.addTask(tAlarm);
 
 #endif

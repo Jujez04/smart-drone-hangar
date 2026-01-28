@@ -3,9 +3,10 @@ package it.unibo.drone.view;
 import it.unibo.drone.controller.DashboardController;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Main dashboard GUI for Drone Remote Unit
@@ -13,135 +14,101 @@ import java.awt.event.*;
 public class DashboardView extends JFrame implements ActionListener {
 
     private DashboardController controller;
+    
+    // UI Elements
+    private JTextField droneStateField;
+    private JTextField hangarStateField;
+    private JTextField distanceField;
+    
     private JButton takeoffButton;
     private JButton landingButton;
-    private JButton statusButton;
-    private JButton emergencyButton;
-    private JTextField hangarStatusField;
-    private JTextField droneStatusField;
-    private JTextField temperatureField;
-    private JTextField distanceField;
-
-    // Status panel with color
-    private JPanel statusIndicator;
 
     public DashboardView() {
         super("Drone Remote Unit (DRU)");
-        setSize(600, 450);
+        setSize(400, 350);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Main panel with padding
+        // Main container
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        mainPanel.setBackground(new Color(240, 240, 240));
 
-        // Title
+        // 1. HEADER TITLE
         JLabel titleLabel = new JLabel("Drone Remote Unit", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(new EmptyBorder(0, 0, 20, 0));
         mainPanel.add(titleLabel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Status indicator panel
-        JPanel indicatorPanel = createStatusIndicatorPanel();
-        mainPanel.add(indicatorPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        // 2. INFO FIELDS PANEL (3 Fields)
+        JPanel fieldsPanel = new JPanel(new GridLayout(3, 2, 10, 15));
+        fieldsPanel.setOpaque(false);
 
-        // Information panel
-        JPanel infoPanel = createInfoPanel();
-        mainPanel.add(infoPanel);
-        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        // Field 1: Drone State
+        fieldsPanel.add(createLabel("Drone State:"));
+        droneStateField = createReadOnlyField("REST");
+        fieldsPanel.add(droneStateField);
 
-        // Control buttons panel
-        JPanel controlPanel = createControlPanel();
-        mainPanel.add(controlPanel);
+        // Field 2: Hangar State
+        fieldsPanel.add(createLabel("Hangar State:"));
+        hangarStateField = createReadOnlyField("NORMAL");
+        hangarStateField.setBackground(new Color(144, 238, 144)); // Light Green
+        fieldsPanel.add(hangarStateField);
+
+        // Field 3: Distance
+        fieldsPanel.add(createLabel("Distance (cm):"));
+        distanceField = createReadOnlyField("--");
+        fieldsPanel.add(distanceField);
+
+        mainPanel.add(fieldsPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // 3. BUTTONS PANEL (2 Buttons)
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+        buttonPanel.setOpaque(false);
+
+        takeoffButton = createStyledButton("TAKEOFF", new Color(70, 130, 180)); // Steel Blue
+        takeoffButton.setForeground(Color.black);
+        landingButton = createStyledButton("LANDING", new Color(255, 140, 0));  // Dark Orange
+        landingButton.setForeground(Color.black);
+        buttonPanel.add(takeoffButton);
+        buttonPanel.add(landingButton);
+
+        mainPanel.add(buttonPanel);
 
         setContentPane(mainPanel);
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(null);
     }
 
-    private JPanel createStatusIndicatorPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("System Status"));
-        panel.setMaximumSize(new Dimension(560, 80));
+    // --- Helper Methods for UI Styling ---
 
-        statusIndicator = new JPanel();
-        statusIndicator.setPreferredSize(new Dimension(540, 50));
-        statusIndicator.setBackground(Color.GRAY);
-        statusIndicator.setBorder(new LineBorder(Color.BLACK, 2));
-
-        JLabel statusLabel = new JLabel("INITIALIZING...", SwingConstants.CENTER);
-        statusLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        statusLabel.setForeground(Color.WHITE);
-        statusIndicator.add(statusLabel);
-
-        panel.add(statusIndicator, BorderLayout.CENTER);
-        return panel;
+    private JLabel createLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setFont(new Font("Arial", Font.BOLD, 14));
+        return l;
     }
 
-    private JPanel createInfoPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Telemetry Data"));
-        panel.setMaximumSize(new Dimension(560, 150));
-
-        // Hangar Status
-        panel.add(new JLabel("Hangar Status:"));
-        hangarStatusField = new JTextField("--");
-        hangarStatusField.setEditable(false);
-        hangarStatusField.setFont(new Font("Monospaced", Font.BOLD, 12));
-        panel.add(hangarStatusField);
-
-        // Drone Status
-        panel.add(new JLabel("Drone Status:"));
-        droneStatusField = new JTextField("--");
-        droneStatusField.setEditable(false);
-        droneStatusField.setFont(new Font("Monospaced", Font.BOLD, 12));
-        panel.add(droneStatusField);
-
-        // Temperature
-        panel.add(new JLabel("Temperature:"));
-        temperatureField = new JTextField("--");
-        temperatureField.setEditable(false);
-        temperatureField.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        panel.add(temperatureField);
-
-        // Distance
-        panel.add(new JLabel("Distance to Ground:"));
-        distanceField = new JTextField("--");
-        distanceField.setEditable(false);
-        distanceField.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        panel.add(distanceField);
-
-        return panel;
+    private JTextField createReadOnlyField(String initialText) {
+        JTextField tf = new JTextField(initialText);
+        tf.setEditable(false);
+        tf.setFont(new Font("Monospaced", Font.BOLD, 14));
+        tf.setHorizontalAlignment(JTextField.CENTER);
+        tf.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        return tf;
     }
 
-    private JPanel createControlPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Drone Commands"));
-        panel.setMaximumSize(new Dimension(560, 120));
-
-        // Takeoff button
-        takeoffButton = new JButton("TAKEOFF");
-        takeoffButton.setFont(new Font("Arial", Font.BOLD, 14));
-        takeoffButton.setBackground(new Color(76, 175, 80));
-        takeoffButton.setForeground(Color.BLACK);
-        takeoffButton.setFocusPainted(false);
-        takeoffButton.addActionListener(this);
-        panel.add(takeoffButton);
-
-        // Landing button
-        landingButton = new JButton("LANDING");
-        landingButton.setFont(new Font("Arial", Font.BOLD, 14));
-        landingButton.setBackground(new Color(33, 150, 243));
-        landingButton.setForeground(Color.BLACK);
-        landingButton.setFocusPainted(false);
-        landingButton.addActionListener(this);
-        panel.add(landingButton);
-        return panel;
+    private JButton createStyledButton(String text, Color bg) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.addActionListener(this);
+        return btn;
     }
+
 
     public void display() {
         SwingUtilities.invokeLater(() -> setVisible(true));
@@ -151,83 +118,61 @@ public class DashboardView extends JFrame implements ActionListener {
         this.controller = controller;
     }
 
-    public void setHangarStatus(String status) {
+    /**
+     * Updates the UI based on the raw status received from Arduino.
+     * Maps the specific firmware states to the required GUI states.
+     */
+    public void updateViewFromStatus(String rawStatus) {
         SwingUtilities.invokeLater(() -> {
-            hangarStatusField.setText(status);
-            updateStatusIndicator(status);
-        });
-    }
+            // 1. Map Hangar State (Normal vs Alarm)
+            if (rawStatus.equals("ALARM")) {
+                hangarStateField.setText("ALARM");
+                hangarStateField.setBackground(Color.RED);
+                hangarStateField.setForeground(Color.WHITE);
+            } else {
+                // Includes INSIDE, TAKE_OFF, PRE_ALARM, etc.
+                hangarStateField.setText("NORMAL");
+                hangarStateField.setBackground(new Color(144, 238, 144)); // Green
+                hangarStateField.setForeground(Color.BLACK);
+            }
 
-    public void setDroneStatus(String status) {
-        SwingUtilities.invokeLater(() -> {
-            droneStatusField.setText(status);
-        });
-    }
-
-    public void setTemperature(double temp) {
-        SwingUtilities.invokeLater(() -> {
-            temperatureField.setText(String.format("%.1f °C", temp));
+            // 2. Map Drone State
+            if (rawStatus.contains("INSIDE")) {
+                droneStateField.setText("REST");
+            } else if (rawStatus.contains("TAKING_OFF")) {
+                droneStateField.setText("TAKING OFF");
+            } else if (rawStatus.contains("OUT")) {
+                droneStateField.setText("OPERATING");
+            } else if (rawStatus.contains("LANDING")) {
+                droneStateField.setText("LANDING");
+            }
+            if (rawStatus.contains("INSIDE") || rawStatus.contains("OUT")) {
+                distanceField.setText("--");
+            }
         });
     }
 
     public void setDistance(double distance) {
         SwingUtilities.invokeLater(() -> {
-            distanceField.setText(String.format("%.1f cm", distance));
+            if (distance <= 0.001) {
+                distanceField.setText("--");
+            } else {
+                distanceField.setText(String.format("%.1f", distance * 100));
+            }
         });
-    }
-
-    private void updateStatusIndicator(String status) {
-        JLabel label = (JLabel) statusIndicator.getComponent(0);
-        label.setText(status);
-
-        if (status.contains("ALARM")) {
-            statusIndicator.setBackground(Color.RED);
-            label.setForeground(Color.WHITE);
-        } else if (status.contains("PRE_ALARM")) {
-            statusIndicator.setBackground(Color.ORANGE);
-            label.setForeground(Color.BLACK);
-        } else if (status.contains("OUT")) {
-            statusIndicator.setBackground(new Color(33, 150, 243)); // Blue
-            label.setForeground(Color.WHITE);
-        } else if (status.contains("INSIDE")) {
-            statusIndicator.setBackground(new Color(76, 175, 80)); // Green
-            label.setForeground(Color.WHITE);
-        } else {
-            statusIndicator.setBackground(Color.GRAY);
-            label.setForeground(Color.WHITE);
-        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (controller == null) return;
-
         try {
             if (e.getSource() == takeoffButton) {
                 controller.sendTakeoffCommand();
             } else if (e.getSource() == landingButton) {
                 controller.sendLandingCommand();
-            } else if (e.getSource() == statusButton) {
-                controller.requestStatus();
-            } else if (e.getSource() == emergencyButton) {
-                int confirm = JOptionPane.showConfirmDialog(
-                    this,
-                    "Send emergency reset to hangar?",
-                    "Confirm Emergency Reset",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-                );
-                if (confirm == JOptionPane.YES_OPTION) {
-                    controller.sendEmergencyReset();
-                }
             }
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Error: " + ex.getMessage(),
-                "Communication Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 }

@@ -13,7 +13,7 @@ void BlinkingTask::init(int period) {
 
 void BlinkingTask::tick() {
 
-    bool systemBusy = pContext->isTakeOffCommandReceived() || pContext->isLandingCommandReceived();
+    bool systemBusy = (pContext->isTakeOffCommandReceived() || pContext->isLandingCommandReceived()) && !(pContext->isPreAlarm() || pContext->isAlarm());
     switch (state) {
         case IDLE: {
             if (checkAndSetJustEntered()) {
