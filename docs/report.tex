@@ -50,11 +50,11 @@
     \vspace{-2cm}
     \vspace{1cm}
     \textbf{\Huge Smart Drone Hangar System}\\[0.5cm]
-    \Large Assignment \#02 - Embedded Systems & IoT\\[0.5cm]
+    \Large Assignment \#02 - Embedded Systems \& IoT\\[0.5cm]
     \large Academic Year 2025-2026
 }
 \author{
-    \textbf{Justin Carideo} \\ 
+    \textbf{Justin Carideo} \\
     ID: 0001115610
 }
 
@@ -75,15 +75,16 @@
 \subsection{Overwiew}
 L'obiettivo è quello di creare un sistema embedded che rappresenta un "Smart Drone Hangar". Il sistema è composto da due sottosistemi:
 \begin{enumerate}
-    \item \textbf{Drone Hangar (Arduino)}: \tobefilled{Descrivi brevemente cosa fa la parte Arduino.}
-    \item \textbf{Drone Remote Unit (PC)}: \tobefilled{Descrivi brevemente cosa fa la GUI Java.}
+    \item \textbf{Drone Hangar (Arduino)}: l'hangar intelligente che gestisce l'apertura/chiusura della porta, monitora la presenza del drone, la distanza e la temperatura interna, e visualizza lo stato su un display LCD.
+    \item \textbf{Drone Remote Unit (PC)}: un'unità remota che consente di monitorare e controllare 
+    l'hangar tramite una GUI Java. Esegue due operazioni in particolare: Takeoff(apertura) e Land(chiusura).
 \end{enumerate}
 
 \subsection{Componenti usate}
 Il sistema utilizza le seguenti componenti hardware:
 \begin{itemize}
-    \item \textbf{Sensors}: \tobefilled{Elenca i sensori (es. HC-SR04, PIR, TMP36...)}
-    \item \textbf{Actuators}: \tobefilled{Elenca gli attuatori (es. Servo Motor, LEDs...)}
+    \item \textbf{Sensors}: HC-SR04 (Sonar), PIR, TMP36 (Temperature Sensor), Button
+    \item \textbf{Actuators}: Servo Motor, LEDs (Red, Green), I2C LCD Display
 \end{itemize}
 
 % ==========================================
@@ -133,14 +134,54 @@ La FSM e le funzioni ausiliarie sono divise in task specifiche:
 % ==========================================
 % SEZIONE 3: MACCHINA A STATI (FSM)
 % ==========================================
-\section{Finite State Machine (FSM) Design}
+\section{Finite State Machines}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/hangarTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/dddTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
 
 
-\subsection{State Diagram}
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/doorTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/blinkingTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
 
 
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/dpdTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
 
-\subsection{Descrizione stati}
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/serialTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/alarmTaskFSM.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
+
 
 % ==========================================
 % SEZIONE 4: HARDWARE
@@ -148,11 +189,11 @@ La FSM e le funzioni ausiliarie sono divise in task specifiche:
 \section{Implementazione Hardware}
 
 \subsection{Schematic / Wiring}
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{schematic.png}
-%     \caption{Circuit Schematic}
-% \end{figure}
+ \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/schematic.png}
+    \caption{Configurazione Hardware del Sistema}
+\end{figure}
 
 \subsection{Configurazione Pin}
 \begin{table}[H]
@@ -192,23 +233,5 @@ I2C LCD & A4/A5 & Output \\
 
 \subsection{GUI}
 
-
-\subsection{Protocollo di Communicazione}
-La communicazione avviene a \textbf{9600 baud}.
-
-\textbf{PC $\to$ Arduino:}
-\begin{itemize}
-    \item 
-\end{itemize}
-
-\textbf{Arduino $\to$ PC:}
-\begin{itemize}
-    \item 
-\end{itemize}
-
-% ==========================================
-% SEZIONE 6: CONCLUSIONI
-% ==========================================
-\section{Conclusioni}
 
 \end{document}
