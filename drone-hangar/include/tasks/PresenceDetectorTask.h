@@ -6,6 +6,12 @@
 #include "devices/pir/Pir.h"
 #include <Arduino.h>
 
+/**
+ * @class PresenceDetectorTask
+ * @brief A task that detects the presence of the drone using a PIR sensor.
+ * Note: This task has a calibration phase at startup. So it has to wait until
+ * the calibration is complete before starting normal operation.
+ */
 class PresenceDetectorTask : public PeriodicTask {
 public:
     PresenceDetectorTask(Pir* pPir, Context* pContext);

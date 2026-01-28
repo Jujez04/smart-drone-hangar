@@ -5,6 +5,12 @@
 #include "model/Context.h"
 #include <Arduino.h>
 
+/**
+ * @class SerialCommTask
+ * @brief A task that handles serial communication with the drone hangar system.
+ * It processes incoming commands and sends status updates periodically.
+ */
+
 class SerialCommTask : public PeriodicTask {
 
 public:

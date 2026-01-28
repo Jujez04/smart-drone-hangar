@@ -4,6 +4,7 @@
 #include "kernel/PeriodicTask.h"
 #include "model/HWPlatform.h"
 
+// For testing purposes only
 class TestHWTask: public PeriodicTask {
 
 public:

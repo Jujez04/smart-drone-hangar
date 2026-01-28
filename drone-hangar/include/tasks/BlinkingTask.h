@@ -6,6 +6,10 @@
 #include "devices/led/Led.h"
 #include <Arduino.h>
 
+/**
+ * @class BlinkingTask
+ * @brief A task that manages the blinking of an LED based on the system context.
+ */
 class BlinkingTask : public PeriodicTask {
 public:
   BlinkingTask(Led *pLed, Context *pContext);
@@ -14,9 +18,9 @@ public:
 
 private:
   enum BlinkingState {
-    IDLE,
-    OFF,
-    ON
+    IDLE, // Waiting
+    OFF, // LED off
+    ON // LED on
   };
 
   void setState(BlinkingState state);

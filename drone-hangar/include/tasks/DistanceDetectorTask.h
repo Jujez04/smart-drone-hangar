@@ -6,6 +6,10 @@
 #include "devices/sonar/Sonar.h"
 #include <Arduino.h>
 
+/**
+ * @class DistanceDetectorTask
+ * @brief A task that detects the distance of the drone using a sonar sensor.
+ */
 class DistanceDetectorTask : public PeriodicTask {
 public:
     DistanceDetectorTask(Sonar* pSonar, Context* pContext);

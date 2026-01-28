@@ -3,6 +3,11 @@
 
 #include "Task.h"
 
+// Periodic implementation
+/**
+ * @class PeriodicTask
+ * @brief A class representing a periodic task in the system.
+ */
 class PeriodicTask : public Task {
 public:
     PeriodicTask() : Task(PERIODIC) {}

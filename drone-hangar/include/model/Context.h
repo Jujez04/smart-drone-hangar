@@ -29,7 +29,6 @@ public:
     void clearResetButtonPressed();
     void clearPreAlarm();
     void clearAlarm();
-    bool isStopped();
     bool isDoorClosed();
     bool isDoorOpen();
     bool isCommandsEnabled();
@@ -41,7 +40,6 @@ public:
     bool isLandingCommandReceived();
     bool isPreAlarm();
     bool isAlarm();
-    bool isResetButtonPressed();
     void setDistance(float d);
     float getDistance();
     const char* getStatusMessageForDRU();

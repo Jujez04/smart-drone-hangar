@@ -9,6 +9,12 @@
 #include <Arduino.h>
 
 
+/**
+ * @class HangarTask
+ * @brief A task that manages the overall logic of the drone hangar.
+ * Mostly it is used to update actuators (LEDs, LCD) based on the current context state.
+ */
+
 class HangarTask: public PeriodicTask {
 
 public:

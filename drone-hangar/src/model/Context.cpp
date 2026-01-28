@@ -62,11 +62,6 @@ bool Context::isDoorOpen()
     return doorOpen && !doorMoving;
 }
 
-bool Context::isStopped()
-{
-    return !doorMoving;
-}
-
 void Context::confirmDroneInside()
 {
     droneIsInsideFlag = true;
@@ -185,11 +180,6 @@ void Context::confirmResetButtonPressed()
 void Context::clearResetButtonPressed()
 {
     resetButtonPressed = false;
-}
-
-bool Context::isResetButtonPressed()
-{
-    return resetButtonPressed;
 }
 
 const char* Context::getStatusMessageForDRU()

@@ -2,8 +2,6 @@
 #include "kernel/Logger.h"
 #include "config.h"
 
-#define SERVO_STEP_DELAY 10 // milliseconds per degree step
-
 DoorTask::DoorTask(ServoMotor *pServo, Context *pContext)
     : pServo(pServo), pContext(pContext)
 {
