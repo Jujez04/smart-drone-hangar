@@ -15,6 +15,8 @@ void DistanceDetectorTask::tick()
     switch (state)
     {
     case IDLE:
+        // For GUI --> "--"
+        pContext->setDistance(0.0);
         timeAboveD1 = 0;
         timeBelowD2 = 0;
         if (pContext->isTakeOffCommandReceived() || pContext->isLandingCommandReceived() || pContext->isDoorOpen())
@@ -22,7 +24,7 @@ void DistanceDetectorTask::tick()
         break;
 
     case ACTIVE:
-        if (pContext->isDroneInside() && !pContext->isTakeOffCommandReceived() && pContext->isDoorClosed())
+        if (pContext->isDoorClosed() && !pContext->isTakeOffCommandReceived() && !pContext->isLandingCommandReceived())
         {
             setState(IDLE);
             break;
@@ -30,16 +32,13 @@ void DistanceDetectorTask::tick()
 
         float distance = readDistance();
 
-        // Filter invalid readings
-        if (!isValidReading(distance))
-            return;
+        if (isValidReading(distance))
+            pContext->setDistance(distance);
 
-        pContext->setDistance(distance);
-        // Takeoff
+        // Take-off detection
         if (distance > D1)
         {
-            if (timeAboveD1 == 0)
-                timeAboveD1 = millis();
+            if (timeAboveD1 == 0) timeAboveD1 = millis();
             if (millis() - timeAboveD1 >= T1)
             {
                 if (!pContext->isDroneOut())
@@ -55,11 +54,10 @@ void DistanceDetectorTask::tick()
             timeAboveD1 = 0;
         }
 
-        // Landing
+        // Landing detection
         if (distance < D2)
         {
-            if (timeBelowD2 == 0)
-                timeBelowD2 = millis();
+            if (timeBelowD2 == 0) timeBelowD2 = millis();
 
             if (millis() - timeBelowD2 >= T2)
             {
@@ -74,7 +72,6 @@ void DistanceDetectorTask::tick()
                 }
                 else
                 {
-                    // Door closed? Reading is noise. Reset timer.
                     timeBelowD2 = 0;
                 }
             }

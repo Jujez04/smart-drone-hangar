@@ -17,6 +17,7 @@ void AlarmTask::init(int period)
 void AlarmTask::tick()
 {
     float currentTemp = pTempSensor->getTemperature();
+    bool resetButtonPressed = pResetButton->isPressed();
     switch (state)
     {
     case IDLE:
@@ -26,6 +27,8 @@ void AlarmTask::tick()
             timeAboveTemp2 = 0;
             pContext->clearPreAlarm();
             pContext->clearAlarm();
+            pContext->clearResetButtonPressed();
+            Serial.println(F("lo:[AlarmTask] State: IDLE"));
             pContext->enableCommands();
         }
         if (currentTemp >= TEMP_1)
@@ -74,9 +77,9 @@ void AlarmTask::tick()
             pContext->disableCommands();
         }
 
-        if (pResetButton->isPressed())
+        if (resetButtonPressed)
         {
-            Serial.println(F("lo:BUTTON PRESSED DETECTED!"));
+            Serial.println(F("lo:[AlarmTask] BUTTON PRESSED DETECTED!"));
             pContext->confirmResetButtonPressed();
             setState(IDLE);
         }
