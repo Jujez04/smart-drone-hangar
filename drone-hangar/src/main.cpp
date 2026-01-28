@@ -35,29 +35,24 @@ AlarmTask* tAlarm;
 // #define __TESTING_HW__
 
 void setup() {
-    // 1. Init System
     Logger.init();
-    delay(100); // Attendi un attimo per stabilizzare la serialeZ
+    delay(100);
     Logger.log("::::: Drone Hangar System Booting :::::");
 
-    sched.init(50); // Base period 50ms (MCD)
+    sched.init(SCHEDULER_BASE_PERIOD);
 
-    // 2. Init Hardware
     pHWPlatform = new HWPlatform();
     pHWPlatform->init();
 
-    // 3. Init Context (Blackboard)
     pContext = new Context();
 #ifndef __TESTING_HW__
 
-    // 4. Instantiate Tasks (Dependency Injection)
-
-    // A. Serial Comm (Aperiodic - runs every cycle)
+    // Serial Communication Task
     tSerial = new SerialCommTask(pContext);
     tSerial->init(SCHEDULER_BASE_PERIOD);
     sched.addTask(tSerial);
 
-    // B. Logic Orchestrator (100ms)
+    // Hangar Task
     tHangar = new HangarTask(
         pHWPlatform->getLcd(),
         pHWPlatform->getL1(),
@@ -67,13 +62,12 @@ void setup() {
     tHangar->init(HANGAR_TASK_PERIOD);
     sched.addTask(tHangar);
 
-    // Presence Detector (PIR - 1000ms)
+    // Presence Detector
     tPresence = new PresenceDetectorTask(pHWPlatform->getPir(), pContext);
     tPresence->init(DPD_TASK_PERIOD);
     sched.addTask(tPresence);
 
-    // C. Actuators
-    // Door Task (100ms movement update)
+    // Door Task
     tDoor = new DoorTask(pHWPlatform->getMotor(), pContext);
     tDoor->init(DOOR_TASK_PERIOD);
     sched.addTask(tDoor);
@@ -83,14 +77,12 @@ void setup() {
     tBlink->init(SENSORS_TASK_PERIOD);
     sched.addTask(tBlink);
 
-    // D. Sensors
-    // Distance Detector (Sonar - 200ms to allow echo)
+    // Distance Detector Task
     tDistance = new DistanceDetectorTask(pHWPlatform->getSonar(), pContext);
     tDistance->init(SENSORS_TASK_PERIOD);
     sched.addTask(tDistance);
 
-
-    // E. Alarm Task
+    // Alarm Task
     tAlarm = new AlarmTask(pHWPlatform->getTempSensor(), pHWPlatform->getButton(), pContext);
     tAlarm->init(ALARM_TASK_PERIOD);
     sched.addTask(tAlarm);

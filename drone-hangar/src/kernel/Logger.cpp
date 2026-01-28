@@ -3,10 +3,8 @@
 #include "config.h"
 
 void LoggerService::init() {
-    if (!Serial) {
-        Serial.begin(9600);
-        delay(100);
-    }
+    Serial.begin(SERIAL_BAUD_RATE);
+    delay(100);
 }
 
 void LoggerService::log(const String& msg){
