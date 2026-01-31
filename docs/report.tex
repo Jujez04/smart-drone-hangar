@@ -12,6 +12,7 @@
 \usepackage{listings}    % Per il codice sorgente
 \usepackage{xcolor}      % Per i colori
 \usepackage{hyperref}    % Per i link e l'indice interattivo
+\usepackage{bookmark}    % Per aggiornare automaticamente gli outline
 \usepackage{longtable}   % Per tabelle lunghe su più pagine
 
 % --- LIBRERIE TIKZ ---
@@ -139,47 +140,47 @@ La FSM e le funzioni ausiliarie sono divise in task specifiche:
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/hangarTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di HangarTask}
 \end{figure}
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/dddTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di DistanceDetectorTask}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/doorTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di DoorTask}
 \end{figure}
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/blinkingTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di BlinkingTask}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/dpdTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di PresenceDetectorTask}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/serialTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di SerialCommTask}
 \end{figure}
 
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{img/alarmTaskFSM.png}
-    \caption{Configurazione Hardware del Sistema}
+    \caption{FSM di AlarmTask}
 \end{figure}
 
 
@@ -232,6 +233,53 @@ I2C LCD & A4/A5 & Output \\
 \section{Drone Remote Unit (Java)}
 
 \subsection{GUI}
+ \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{img/gui.png}
+    \caption{A sinistra: Log View, a destra: Dashboard View}
+\end{figure}
 
+\subsection{Protocollo di comunicazione seriale tra Arduino e PC}
+
+Il sistema utilizza un protocollo testuale basato su prefissi per distinguere la tipologia di informazione scambiata sulla porta seriale:
+
+\begin{itemize}
+    \item \textbf{\texttt{dh:}} (Drone Hangar): Messaggi di stato applicativi inviati da Arduino verso la GUI.
+    \item \textbf{\texttt{lo:}} (Log): Messaggi di debug e informazioni di sistema per il monitoraggio interno.
+    \item \textbf{\texttt{ru:}} (Remote Unit): Comandi inviati dalla GUI Java verso Arduino.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\begin{longtable}{@{} l p{6cm} l @{}}
+\caption{Dettaglio del Protocollo di Messaggistica} \label{tab:protocollo} \\
+\toprule
+\textbf{Prefisso} & \textbf{Messaggio / Comando} & \textbf{Descrizione} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Prefisso} & \textbf{Messaggio / Comando} & \textbf{Descrizione} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\texttt{dh:} & \texttt{STATUS:DRONE\_INSIDE} & Il drone è all'interno dell'hangar. \\
+\texttt{dh:} & \texttt{STATUS:TAKING\_OFF}  & Fase di decollo (apertura porta). \\
+\texttt{dh:} & \texttt{STATUS:DRONE\_OUT}    & Il drone è fuori dall'hangar. \\
+\texttt{dh:} & \texttt{STATUS:LANDING}      & Fase di atterraggio (chiusura porta). \\
+\texttt{dh:} & \texttt{STATUS:ALARM}        & Stato di allarme critico (sovratemperatura). \\
+\texttt{dh:} & \texttt{DIST:<valore>}       & Invio della distanza rilevata dal Sonar (cm). \\
+\midrule
+\texttt{lo:} & \texttt{System initialized}  & Notifica di avvio completato. \\
+\texttt{lo:} & \texttt{CMD TAKEOFF}         & Log di ricezione comando di decollo. \\
+\texttt{lo:} & \texttt{[TaskName] State:X}  & Debug dello stato interno di una specifica task. \\
+\texttt{lo:} & \texttt{ERR CMD:UNKNOWN}     & Errore nel parsing del comando ricevuto. \\
+\midrule
+\texttt{ru:} & \texttt{TAKEOFF}             & Richiesta di apertura porta per decollo. \\
+\texttt{ru:} & \texttt{LANDING}             & Richiesta di chiusura porta per atterraggio. \\
+\texttt{ru:} & \texttt{RESET}               & Ripristino del sistema dopo un allarme. \\
+\bottomrule
+\end{longtable}
 
 \end{document}
